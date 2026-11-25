@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "benchbias"
+version = "0.1.0"
+description = "Thesis code: institutional and community framings of social bias in LLM benchmarks"
+authors = [{ name = "Elena Mijares Lopez" }]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "matplotlib",
+  "pyarrow",
+]
+
+[project.optional-dependencies]
+pipeline = [
+  "datasets",
+  "sentence-transformers",
+  "umap-learn",
+  "hdbscan",
+  "bertopic",
+]
+dev = ["pytest", "nbstripout"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

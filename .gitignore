@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Data and generated outputs (re-creatable from notebooks; see data/README.md)
+data/raw/
+data/interim/
+outputs/*
+!outputs/.gitkeep
+*.npy
+*.parquet
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
