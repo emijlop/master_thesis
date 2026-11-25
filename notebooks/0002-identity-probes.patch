@@ -1,0 +1,851 @@
+From f24f0a56120ef6fe2646066556b5ffb305972027 Mon Sep 17 00:00:00 2001
+From: Elena Mijares Lopez <emijlop@users.noreply.github.com>
+Date: Wed, 25 Nov 2026 17:20:44 +0100
+Subject: [PATCH] Add identity-dimension probes (notebook 02)
+
+- src/benchbias/identity_probes.py: one-vs-rest logistic probes per identity
+  dimension on frozen embeddings, control-task selectivity, direction
+  similarity, transfer check, per-cluster driver profiles, co-activation,
+  per-language centering
+- src/benchbias/heseia.py: HESEIA CSV loader with configurable columns and
+  label map (unmapped labels kept as own dimensions)
+- notebooks/02_identity_probes.ipynb: HESEIA-trained probes applied to BBQ
+  clusters; fine-tuning only as optional comparison
+- notebook 01 now exports cluster assignments for notebook 02
+- tests, decision log, research design, data sources
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_016LR3LGosbswEW9vzv8iARN
+---
+ README.md                                     |   2 +
+ data/README.md                                |   3 +-
+ docs/decision_log.md                          |  24 +-
+ docs/research_design.md                       |  10 +
+ notebooks/01_bbq_rq1_internal_coherence.ipynb |   3 +
+ notebooks/02_identity_probes.ipynb            | 379 ++++++++++++++++++
+ src/benchbias/heseia.py                       |  72 ++++
+ src/benchbias/identity_probes.py              | 141 +++++++
+ tests/test_identity_probes.py                 |  88 ++++
+ 9 files changed, 720 insertions(+), 2 deletions(-)
+ create mode 100644 notebooks/02_identity_probes.ipynb
+ create mode 100644 src/benchbias/heseia.py
+ create mode 100644 src/benchbias/identity_probes.py
+ create mode 100644 tests/test_identity_probes.py
+
+diff --git a/README.md b/README.md
+index 6cdbcff..0c43721 100644
+--- a/README.md
++++ b/README.md
+@@ -35,8 +35,10 @@ Details and metric definitions: [`docs/research_design.md`](docs/research_design
+ notebooks/
+   00_exploration_bertopic_bbq.ipynb     first BERTopic run (superseded, kept for the record)
+   01_bbq_rq1_internal_coherence.ipynb   RQ1 on BBQ: masked/unmasked views, metrics, sensitivity, probe
++  02_identity_probes.ipynb              HESEIA-trained identity probes on frozen LaBSE -> which dimension drives each BBQ cluster
+ src/benchbias/                           shared code imported by all notebooks
+   bbq.py       loading, units, masking         metrics.py  RQ1 metrics
++  heseia.py    HESEIA loading, label mapping   identity_probes.py  per-dimension probes, transfer, cluster drivers
+   embed.py     cached frozen embeddings        cluster.py  UMAP→HDBSCAN, sweep
+   probe.py     template-grouped linear probe   plots.py    figures
+   schema.py    common cross-benchmark schema + category crosswalks
+diff --git a/data/README.md b/data/README.md
+index e54940f..31a51ca 100644
+--- a/data/README.md
++++ b/data/README.md
+@@ -5,8 +5,9 @@ No benchmark data is committed. Each notebook downloads what it needs, and gener
+ | Benchmark | Source | Loaded by | Notes |
+ |---|---|---|---|
+ | BBQ (Parrish et al., 2022) | Hugging Face `heegyu/bbq` (parquet conversion of the official release) | `benchbias.bbq.load_bbq_raw()` | 58,492 items, 11 categories (9 single-axis + Race×Gender, Race×SES) |
+-| HESEIA (Ivetta et al., 2025) | _to add_ | — | Spanish, 46,499 sentences, community-built, multi-label (intersectional) |
++| HESEIA (Ivetta et al., 2025) | Mozilla Data Collective, "HESEIA Sentence Bias Dataset" (CSV, CC-BY-SA-4.0, steward Fundación Vía Libre). Download manually to `data/raw/heseia/` | `benchbias.heseia.load_heseia()` (set columns + label map first) | Spanish, 46,499 sentences, community-built, multi-label (intersectional) |
+ | WinoBias (Zhao et al., 2018) | _to add_ | — | English, 3,160 sentences, binary gender × 40 occupations |
++| WinoQueer (Felkner et al., 2023) | github.com/katyfelkner/winoqueer (CrowS-Pairs format) | — | community-in-the-loop, LGBTQ+ only, templated; held-out check for probes |
+ | EsBBQ (Ruiz-Fernández et al., 2025) | _to add_ | — | Spanish BBQ adaptation; **language control** for RQ3 |
+ 
+ If a source needs a manual download, put it in `data/raw/<benchmark>/` (git-ignored) and record the version, date and URL here.
+diff --git a/docs/decision_log.md b/docs/decision_log.md
+index 9227b36..f0e128e 100644
+--- a/docs/decision_log.md
++++ b/docs/decision_log.md
+@@ -4,6 +4,27 @@ One entry per methodological decision: what was decided, why, and what it affect
+ 
+ ---
+ 
++### 2026-11-25 · Identity-dimension probes on frozen LaBSE (notebook 02)
++**Decision:** one linear (logistic) probe per identity dimension, trained on frozen LaBSE embeddings of **HESEIA**. The probes are applied to other benchmarks' items and averaged per cluster to find which dimension "drives" each cluster.
++**Why:**
++- It complements clustering (where items fall) with a labelled view (which dimension the content expresses).
++- HESEIA's community labels serve as the *reference frame*, not ground truth, consistent with the contestedness argument.
++- Linear probes keep the result interpretable: one direction per dimension.
++
++**Safeguards:**
++- grouped CV;
++- control task with selectivity (Hewitt & Liang, 2019);
++- transfer check against BBQ's own harmonized labels before interpreting projections;
++- masked vs. unmasked BBQ;
++- per-language centering;
++- thresholds fixed in advance (AUC ≥ 0.75, selectivity ≥ 0.2, transfer AUC ≥ 0.70).
++
++**Not chosen:**
++- *Fine-tuning LaBSE for the main analysis.* Clustering a space trained on identity labels would be circular. Fine-tuning (e.g. SetFit) stays an optional robustness comparison, and its embeddings are never used for clustering.
++- *Mixing HESEIA and WinoQueer as training data.* Probes would learn the dataset source, not the dimension. WinoQueer is better kept as a held-out check for sexual-orientation and gender-identity probes.
++
++**Open:** HESEIA column names and label map (fill after inspecting the CSV); grouping variable for CV.
++
+ ### 2026-11-25 · De-duplicate within category, report cross-category duplicates
+ **Decision:** masked/unmasked units are de-duplicated on `(category, text)`, not on text alone. Texts identical across categories are listed with `bbq.shared_texts()`.
+ **Why:** de-duplicating on text alone silently deletes one category's items when two categories share an identical scenario after masking, e.g. Race×Gender vs. Race_ethnicity. That overlap is itself evidence that the category is carried only by the substituted label.
+@@ -39,5 +60,6 @@ One entry per methodological decision: what was decided, why, and what it affect
+ - [ ] HESEIA unit of analysis: single stereotype sentence? How to treat multi-label (intersectional) items in purity metrics?
+ - [ ] HESEIA → harmonized category crosswalk (see `crosswalk.md`)
+ - [ ] Merged-corpus sampling: equal per benchmark × category, or proportional?
+-- [ ] Add EsBBQ as a language control (likely yes)
++- [ ] Add EsBBQ as a language control (likely yes; also needed to read probe transfer in notebook 02)
++- [ ] Optional: fine-tuned-encoder comparison for the probes (SetFit), only as a robustness check
+ - [ ] Orphan-cluster threshold (90% single-benchmark?)
+diff --git a/docs/research_design.md b/docs/research_design.md
+index abc3f53..7f94ecc 100644
+--- a/docs/research_design.md
++++ b/docs/research_design.md
+@@ -45,6 +45,15 @@ Reference points:
+ 
+ **Linear probe:** multinomial logistic regression on frozen embeddings, with cross-validation **grouped by template**. The gap between random-split and grouped scores quantifies template leakage. The confusion matrix shows which categories the content fails to separate (structural validity).
+ 
++**Identity-dimension probes (notebook 02):** one logistic probe per dimension, trained on frozen LaBSE embeddings of HESEIA (community labels as reference frame). Reported per dimension:
++- cross-validated AUC and selectivity against a control task;
++- cosine similarity between probe directions (structural validity);
++- transfer AUC on BBQ's own labels (RQ2);
++- per-cluster driver dimension vs. BBQ's own category (RQ1/RQ2);
++- co-activation on intersectional items.
++
++Projections are interpreted only for dimensions that pass the thresholds fixed in the decision log.
++
+ ## 5. Confounds to control before claiming erasure (RQ3)
+ 
+ | Confound | Why it matters | Control |
+@@ -53,3 +62,4 @@ Reference points:
+ | Format | QA scenarios vs. stereotype statements vs. coreference sentences | report clusters that are single-benchmark *and* single-format; compare masked units; qualitative reading of orphans |
+ | Size / redundancy | BBQ's 58k items come from ~325 templates | template-level normalization; balanced samples per category in the merged corpus |
+ | Encoder | LaBSE is trained for translation retrieval, not similarity | repeat with an STS-trained multilingual encoder |
++| Probe shortcut | probes may read identity words or dataset style, not the dimension | control task / selectivity; masked BBQ; train on one dataset only; per-language centering |
+diff --git a/notebooks/01_bbq_rq1_internal_coherence.ipynb b/notebooks/01_bbq_rq1_internal_coherence.ipynb
+index dd7b88c..f4980f2 100644
+--- a/notebooks/01_bbq_rq1_internal_coherence.ipynb
++++ b/notebooks/01_bbq_rq1_internal_coherence.ipynb
+@@ -359,6 +359,9 @@
+     "for v in D:\n",
+     "    schema.to_schema(D[v], \"BBQ\").to_parquet(OUT / f\"bbq_{v}.parquet\", index=False)\n",
+     "    np.save(OUT / f\"bbq_{v}_labse.npy\", E[v])\n",
++    "    # cluster assignments, same row order as the embeddings; used by notebook 02 (identity probes)\n",
++    "    D[v][[\"template_id\", \"category\", \"intersectional\", \"text\", \"cluster\"]].to_parquet(\n",
++    "        OUT / f\"bbq_{v}_clusters.parquet\", index=False)\n",
+     "sorted(p.name for p in OUT.iterdir())"
+    ]
+   }
+diff --git a/notebooks/02_identity_probes.ipynb b/notebooks/02_identity_probes.ipynb
+new file mode 100644
+index 0000000..09602ce
+--- /dev/null
++++ b/notebooks/02_identity_probes.ipynb
+@@ -0,0 +1,379 @@
++{
++ "cells": [
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "<a href=\"https://colab.research.google.com/github/emijlop/master_thesis/blob/main/notebooks/02_identity_probes.ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>\n",
++    "\n",
++    "# 02 · Identity-dimension probes: which dimension drives each cluster?\n",
++    "\n",
++    "**Idea.** Train one linear probe per identity dimension on **frozen LaBSE** embeddings of a **community-built** benchmark (HESEIA). Each probe learns a direction in embedding space for one dimension (age, gender, disability, race/ethnicity, …). Projecting the items of another benchmark (BBQ, from notebook 01) onto these directions gives every cluster a profile across dimensions. The highest-scoring dimension is the one that, from the community's point of view, *drives* that cluster.\n",
++    "\n",
++    "**How it connects to the research questions**\n",
++    "\n",
++    "| Output | Question it informs |\n",
++    "|---|---|\n",
++    "| Probe quality per dimension (§3) | Is each community-defined dimension linearly represented in LaBSE at all? A precondition for everything else |\n",
++    "| Similarity between probe directions (§4) | Structural validity: do e.g. gender and sexual orientation share a direction or stay separate? |\n",
++    "| Transfer to BBQ's own labels (§5) | RQ2: does BBQ's \"gender\" match HESEIA's \"gender\"? Low transfer means divergent operationalizations, or a language/format shift (see controls) |\n",
++    "| Cluster driver vs. BBQ's own category (§6) | RQ1/RQ2: a BBQ cluster labelled SES but driven by HESEIA's \"profession\" or \"race\" dimension |\n",
++    "| Co-activation on intersectional items (§7) | Additive vs. co-constitutive intersectionality |\n",
++    "\n",
++    "**Framing:** HESEIA labels are a *reference frame*, not ground truth. They are one systematization of the background concepts (contestedness), chosen deliberately because they come from the community. Every result reads as \"*from HESEIA's standpoint*, this BBQ cluster is driven by …\"."
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "### Design decisions (also in `docs/decision_log.md`)\n",
++    "\n",
++    "**1. Frozen LaBSE + linear probe (main analysis), not fine-tuning.**\n",
++    "- Fine-tuning LaBSE on identity labels would reshape the embedding space around HESEIA's categories. Clustering in that space would be **circular**: clusters would align with categories because the model was trained to make them align. The proposal's frozen-encoder argument (§4.2.1, step 3) depends on this not happening.\n",
++    "- Linear probes are the standard way to ask \"is concept X represented in these embeddings?\". They are interpretable: a weight vector is a direction you can project onto. Following Hewitt & Liang (2019), each probe is reported with a **control task** (same probe, shuffled labels), so high accuracy can't come from the probe memorizing.\n",
++    "- Fine-tuning appears only as an optional comparison in §8. Its embeddings are **never** used for the clustering of notebook 01.\n",
++    "\n",
++    "**2. Train on HESEIA alone, not HESEIA + WinoQueer mixed.**\n",
++    "- If positives for one dimension came from one dataset (WinoQueer → sexual orientation) and negatives from another, the probe would learn *which dataset* an item comes from (language, format, template), not the dimension.\n",
++    "- WinoQueer is also highly templated (11 template sentences, 9 queer identity groups, 60 names, 182 predicates) and covers only LGBTQ+ identities. It is better used as a **held-out check** for a sexual-orientation / gender-identity probe: does a HESEIA-trained probe recognize WinoQueer items?\n",
++    "\n",
++    "**3. Explicit criteria for when results can be interpreted**, fixed before looking at cluster results:\n",
++    "- a dimension is used only if its cross-validated **selectivity ≥ 0.2** and **AUC ≥ 0.75** on HESEIA (§3);\n",
++    "- for interpreting BBQ clusters, additionally **transfer AUC ≥ 0.70** on BBQ's own harmonized labels (§5).\n",
++    "These thresholds are a choice; record any change in the decision log."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "# Setup (Colab or local), as in notebook 01\n",
++    "import sys, subprocess\n",
++    "from pathlib import Path\n",
++    "if \"google.colab\" in sys.modules and not Path(\"master_thesis\").exists():\n",
++    "    subprocess.run([\"git\", \"clone\", \"-q\", \"https://github.com/emijlop/master_thesis.git\"], check=True)\n",
++    "    subprocess.run([sys.executable, \"-m\", \"pip\", \"install\", \"-q\", \"-e\", \"master_thesis[pipeline]\"], check=True)\n",
++    "for p in [Path(\"master_thesis/src\"), Path(\"../src\")]:\n",
++    "    if p.exists(): sys.path.insert(0, str(p.resolve()))\n",
++    "\n",
++    "import numpy as np, pandas as pd, matplotlib.pyplot as plt\n",
++    "from benchbias import SEED, ENCODER, heseia, identity_probes as ip\n",
++    "from benchbias.embed import embed\n",
++    "\n",
++    "OUT = Path(\"outputs\"); OUT.mkdir(exist_ok=True)\n",
++    "HESEIA_CSV = Path(\"data/raw/heseia/heseia.csv\")   # MODIFY: path to the downloaded CSV\n",
++    "\n",
++    "MIN_AUC, MIN_SELECTIVITY, MIN_TRANSFER_AUC = 0.75, 0.2, 0.70"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 1. Load HESEIA and harmonize its labels\n",
++    "\n",
++    "Download the CSV from the Mozilla Data Collective (\"HESEIA Sentence Bias Dataset\") into `data/raw/heseia/`. Run `inspect_heseia` once, then set the column names and label map in `src/benchbias/heseia.py` (or pass them here). Native labels without a mapping keep their own name. HESEIA-only dimensions such as geographic origin or profession are exactly what RQ3 is about, so they become their own probes rather than being forced into a BBQ category."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "heseia.inspect_heseia(HESEIA_CSV)"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "COLUMNS = {\"text\": None, \"labels\": None, \"group\": None}   # MODIFY after inspection\n",
++    "LABEL_MAP = {}                                            # MODIFY: native label -> harmonized construct\n",
++    "\n",
++    "H = heseia.load_heseia(HESEIA_CSV, columns=COLUMNS, label_map=LABEL_MAP)\n",
++    "print(H.shape, \"| intersectional share:\", H[\"intersectional\"].mean().round(3))\n",
++    "Y = ip.multi_hot(H[\"dimensions\"])\n",
++    "Y.sum().sort_values(ascending=False)"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "# Co-occurrence of dimensions in HESEIA: which intersections did the community write about?\n",
++    "co = Y.T @ Y\n",
++    "co.where(~np.eye(len(co), dtype=bool)).fillna(0).astype(int)"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 2. Embed with frozen LaBSE"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "X = embed(H[\"text\"], ENCODER, cache=OUT / \"emb_heseia_LaBSE.npy\")\n",
++    "groups = H[\"group\"].to_numpy() if H[\"group\"].notna().all() else None\n",
++    "X.shape, (\"grouped CV\" if groups is not None else \"no group column: plain K-fold (check near-duplicates!)\")"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 3. Probe quality: is each dimension represented, beyond what the probe could memorize?"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "quality = ip.evaluate_probes(X, Y, groups=groups, seed=SEED)\n",
++    "quality[\"usable\"] = (quality[\"AUC\"] >= MIN_AUC) & (quality[\"selectivity\"] >= MIN_SELECTIVITY)\n",
++    "quality.to_csv(OUT / \"probe_quality_heseia.csv\")\n",
++    "quality.sort_values(\"AUC\", ascending=False)"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "probes = ip.fit_probes(X, Y)\n",
++    "usable_heseia = quality.index[quality[\"usable\"].fillna(False)].tolist()\n",
++    "print(\"usable dimensions:\", usable_heseia)"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 4. Geometry: how do the dimensions relate in embedding space? (structural validity)\n",
++    "\n",
++    "High cosine similarity between two probe directions means LaBSE, trained on HESEIA's items, represents the two dimensions in nearly the same way. Gender identity vs. sexual orientation is the pair to watch; your brainstorming notes ask whether they are \"related or siloed\"."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "sim = ip.direction_similarity({d: probes[d] for d in usable_heseia})\n",
++    "fig, ax = plt.subplots(figsize=(6, 5))\n",
++    "im = ax.imshow(sim.values, cmap=\"RdBu_r\", vmin=-1, vmax=1)\n",
++    "ax.set_xticks(range(len(sim)), sim.index, rotation=45, ha=\"right\", fontsize=8)\n",
++    "ax.set_yticks(range(len(sim)), sim.index, fontsize=8)\n",
++    "for s in ax.spines.values(): s.set_visible(False)\n",
++    "fig.colorbar(im, ax=ax, label=\"cosine similarity of probe directions\", shrink=0.8)\n",
++    "ax.set_title(\"HESEIA identity directions in LaBSE\", loc=\"left\", fontsize=11)\n",
++    "fig.tight_layout(); fig.savefig(OUT / \"probe_direction_similarity.png\", dpi=200); plt.show()\n",
++    "sim"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 5. Transfer check on BBQ: can HESEIA's probes be read on BBQ at all?\n",
++    "\n",
++    "Each probe is applied to BBQ items (from notebook 01) and scored against BBQ's **own** harmonized labels. Intersection labels count for both parts. Two readings are possible, and the controls tell them apart:\n",
++    "- **low transfer because of language/format**: the transfer also fails on **EsBBQ** (Spanish, same format as BBQ) or improves after per-language centering → a technical shift, not a finding;\n",
++    "- **low transfer despite controls**: HESEIA's and BBQ's operationalizations of that dimension diverge → evidence for RQ2.\n",
++    "\n",
++    "Both views are compared. If transfer works only on **unmasked** BBQ, the probes rely on identity words rather than stereotype content."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "from benchbias.schema import CROSSWALK\n",
++    "BBQ = {}\n",
++    "for v in [\"masked\", \"unmasked\"]:\n",
++    "    df = pd.read_parquet(OUT / f\"bbq_{v}_clusters.parquet\")       # written by notebook 01, §10\n",
++    "    Xb = np.load(OUT / f\"bbq_{v}_labse.npy\")\n",
++    "    S = ip.score(Xb, probes)\n",
++    "    BBQ[v] = dict(df=df, X=Xb, S=S, harmonized=df[\"category\"].map(CROSSWALK[\"BBQ\"]))\n",
++    "\n",
++    "transfer = pd.concat({v: ip.transfer_check(BBQ[v][\"S\"], BBQ[v][\"harmonized\"]) for v in BBQ}, axis=1)\n",
++    "transfer"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "# Robustness: remove the language offset (HESEIA = es, BBQ = en) and re-check transfer\n",
++    "Xall = np.vstack([X, BBQ[\"masked\"][\"X\"]])\n",
++    "Xc = ip.center_by_group(Xall, [\"es\"] * len(X) + [\"en\"] * len(BBQ[\"masked\"][\"X\"]))\n",
++    "probes_c = ip.fit_probes(Xc[: len(X)], Y)\n",
++    "S_c = ip.score(Xc[len(X):], probes_c)\n",
++    "pd.concat({\"raw\": transfer[(\"masked\", \"transfer_AUC\")],\n",
++    "           \"language-centered\": ip.transfer_check(S_c, BBQ[\"masked\"][\"harmonized\"])[\"transfer_AUC\"]}, axis=1)"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "usable_bbq = [d for d in usable_heseia\n",
++    "              if transfer.get((\"masked\", \"transfer_AUC\"), pd.Series(dtype=float)).get(d, np.nan) >= MIN_TRANSFER_AUC]\n",
++    "print(\"dimensions interpretable on BBQ (masked):\", usable_bbq)\n",
++    "# Dimensions with no BBQ counterpart (e.g. profession, geographic_origin) have no transfer AUC.\n",
++    "# They can still be projected, but read them descriptively: 'how much of HESEIA's X is in this cluster'."
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 6. Cluster profiles: which dimension drives each BBQ cluster?\n",
++    "\n",
++    "For each cluster from notebook 01: the mean probe score per dimension, the **driver** (highest dimension), its **margin** over the runner-up, and BBQ's own dominant category. Disagreements are the interesting rows. A small margin means the cluster is driven by no single dimension, which may itself be a sign of intersectional or mixed content."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "profiles = {}\n",
++    "for v in BBQ:\n",
++    "    profiles[v] = ip.cluster_profiles(BBQ[v][\"S\"], BBQ[v][\"df\"][\"cluster\"],\n",
++    "                                      native=BBQ[v][\"harmonized\"], usable=usable_bbq or None)\n",
++    "    profiles[v].to_csv(OUT / f\"cluster_profiles_bbq_{v}.csv\")\n",
++    "p = profiles[\"masked\"]\n",
++    "print(\"driver == BBQ's own category:\", (p[\"driver\"] == p[\"native_dominant\"]).mean().round(3))\n",
++    "p.sort_values(\"driver_margin\").head(20)"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "pd.crosstab(p[\"native_dominant\"], p[\"driver\"], values=p[\"size\"], aggfunc=\"sum\").fillna(0).astype(int)"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "# All projected dimensions (incl. HESEIA-only ones), descriptive heatmap of cluster profiles\n",
++    "dims_all = [d for d in probes]\n",
++    "prof_all = ip.cluster_profiles(BBQ[\"masked\"][\"S\"], BBQ[\"masked\"][\"df\"][\"cluster\"], native=BBQ[\"masked\"][\"harmonized\"])\n",
++    "M = prof_all[dims_all].sort_values(by=dims_all[0]).values\n",
++    "fig, ax = plt.subplots(figsize=(1 + 0.5 * len(dims_all), 6))\n",
++    "im = ax.imshow(M, aspect=\"auto\", cmap=\"Blues\", vmin=0, vmax=1)\n",
++    "ax.set_xticks(range(len(dims_all)), dims_all, rotation=45, ha=\"right\", fontsize=8); ax.set_yticks([])\n",
++    "ax.set_ylabel(\"BBQ clusters (masked)\")\n",
++    "for s in ax.spines.values(): s.set_visible(False)\n",
++    "fig.colorbar(im, ax=ax, label=\"mean probe score\", shrink=0.8)\n",
++    "ax.set_title(\"BBQ clusters seen through HESEIA's dimensions\", loc=\"left\", fontsize=11)\n",
++    "fig.tight_layout(); fig.savefig(OUT / \"cluster_profiles_bbq_masked.png\", dpi=200); plt.show()"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 7. Intersectional items: do two dimensions fire together?\n",
++    "\n",
++    "For BBQ's Race×Gender and Race×SES items, how often do both corresponding probes fire? Under a co-constitutive operationalization, both should be active. If only race fires, the second axis is present in the text but not represented as a dimension."
++   ]
++  },
++  {
++   "cell_type": "code",
++   "metadata": {},
++   "execution_count": null,
++   "outputs": [],
++   "source": [
++    "df, S = BBQ[\"masked\"][\"df\"], BBQ[\"masked\"][\"S\"]\n",
++    "for cat in [\"Race_x_gender\", \"Race_x_SES\"]:\n",
++    "    print(f\"\\n{cat}\")\n",
++    "    display(ip.co_activation(S, df[\"category\"] == cat).head(5))\n",
++    "print(\"\\nbaseline: single-axis Race_ethnicity items\")\n",
++    "display(ip.co_activation(S, df[\"category\"] == \"Race_ethnicity\").head(5))"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 8. Optional comparison: fine-tuned encoder\n",
++    "\n",
++    "Pranav's alternative: fine-tune LaBSE on HESEIA's dimensions, then freeze it and probe. This is a legitimate **comparison**, with two guardrails:\n",
++    "1. Fine-tune on a HESEIA **training split** only, and evaluate probes on held-out HESEIA and on BBQ, so the probes don't simply re-read the training labels.\n",
++    "2. Never use the fine-tuned embeddings for the clustering of notebook 01 (circularity, see top).\n",
++    "\n",
++    "What it answers: *does making the encoder identity-aware change which dimension drives BBQ's clusters?* If the drivers stay the same, the frozen results are robust. If they change, report it as sensitivity to the representation.\n",
++    "\n",
++    "Lightest-weight option: [SetFit](https://github.com/huggingface/setfit), which contrastively fine-tunes a sentence-transformer on few labelled examples and works with LaBSE. It runs on a Colab GPU. Sketch:\n",
++    "\n",
++    "```python\n",
++    "# from setfit import SetFitModel, Trainer, TrainingArguments\n",
++    "# model = SetFitModel.from_pretrained(ENCODER, multi_target_strategy=\"one-vs-rest\")\n",
++    "# trainer = Trainer(model=model, train_dataset=train_ds, args=TrainingArguments(num_epochs=1, batch_size=32))\n",
++    "# trainer.train()\n",
++    "# X_ft = model.model_body.encode(texts, normalize_embeddings=True)   # then re-run §3, §5, §6 with X_ft\n",
++    "```"
++   ]
++  },
++  {
++   "cell_type": "markdown",
++   "metadata": {},
++   "source": [
++    "## 9. Interpretation scaffold\n",
++    "\n",
++    "| Observation | Evidence | Validity facet |\n",
++    "|---|---|---|\n",
++    "| Dimension not linearly represented (low selectivity) | §3 | limit of the instrument, not a benchmark finding |\n",
++    "| Two dimensions share a direction | §4 | structural |\n",
++    "| HESEIA probe does not transfer to BBQ's same-named category, despite controls | §5 | substantive / contestedness (RQ2) |\n",
++    "| BBQ cluster driven by a different dimension than its label | §6 | substantive (RQ1/RQ2) |\n",
++    "| HESEIA-only dimensions (e.g. profession, geographic origin) score high in BBQ clusters | §6 heatmap | content BBQ carries but does not label (RQ3) |\n",
++    "| Intersectional items activate only one axis | §7 | structural (additive vs. co-constitutive) |"
++   ]
++  }
++ ],
++ "metadata": {
++  "kernelspec": {
++   "display_name": "Python 3",
++   "language": "python",
++   "name": "python3"
++  },
++  "language_info": {
++   "name": "python"
++  }
++ },
++ "nbformat": 4,
++ "nbformat_minor": 5
++}
+\ No newline at end of file
+diff --git a/src/benchbias/heseia.py b/src/benchbias/heseia.py
+new file mode 100644
+index 0000000..a031806
+--- /dev/null
++++ b/src/benchbias/heseia.py
+@@ -0,0 +1,72 @@
++"""HESEIA (Ivetta et al., 2025): loading and label harmonization.
++
++Source: HESEIA Sentence Bias Dataset, Mozilla Data Collective (CSV, CC-BY-SA-4.0), steward Fundación
++Vía Libre. Download manually into data/raw/heseia/ and record version and date in data/README.md.
++
++The column names and label vocabulary are NOT hard-coded from the paper: inspect the CSV first
++(`inspect_heseia`), then fill COLUMNS and LABEL_MAP. Labels that do not map to a shared construct
++keep their own harmonized name (see docs/crosswalk.md): forcing them into BBQ categories would hide
++exactly the territory RQ3 looks for.
++"""
++from __future__ import annotations
++
++import re
++from pathlib import Path
++
++import pandas as pd
++
++# Fill after inspecting the CSV. Values are column names in the HESEIA file.
++COLUMNS = {
++    "text": None,        # stereotype sentence
++    "labels": None,      # bias type(s); possibly several per item (intersectional)
++    "group": None,       # optional: creator / school / pair id, used to group CV folds
++}
++
++# Native HESEIA label (lower-cased, stripped) -> harmonized construct. Fill after inspection.
++LABEL_MAP: dict[str, str] = {
++    # "género": "gender",
++    # "edad": "age",
++    # "discapacidad": "disability",
++    # "origen geográfico": "geographic_origin",   # own label: do not force into nationality/race
++    # "nivel socioeconómico": "ses",
++    # "profesión": "profession",
++    # ...
++}
++
++SPLIT = re.compile(r"\s*[,;|/]\s*|\s+y\s+|\s*×\s*")
++
++
++def inspect_heseia(path: str | Path, **read_kw) -> None:
++    df = pd.read_csv(path, **read_kw)
++    print(df.shape)
++    print(df.dtypes)
++    print(df.head(5).to_string())
++    for c in df.columns:
++        if df[c].dtype == object and df[c].nunique() < 200:
++            print(f"\n--- {c} ({df[c].nunique()} values)")
++            print(df[c].value_counts().head(30).to_string())
++
++
++def parse_labels(cell) -> list[str]:
++    if pd.isna(cell):
++        return []
++    return [p.strip().lower() for p in SPLIT.split(str(cell)) if p.strip()]
++
++
++def load_heseia(path: str | Path, columns: dict | None = None, label_map: dict | None = None,
++                **read_kw) -> pd.DataFrame:
++    """Returns text, native_labels (list), dimensions (list of harmonized labels), group."""
++    cols = columns or COLUMNS
++    lmap = label_map if label_map is not None else LABEL_MAP
++    if not cols.get("text") or not cols.get("labels"):
++        raise ValueError("Set heseia.COLUMNS['text'] and ['labels'] after running inspect_heseia().")
++    raw = pd.read_csv(path, **read_kw)
++    out = pd.DataFrame({"text": raw[cols["text"]].astype(str).str.strip()})
++    out["native_labels"] = raw[cols["labels"]].apply(parse_labels)
++    out["dimensions"] = out["native_labels"].apply(lambda ls: sorted({lmap.get(l, l) for l in ls}))
++    out["group"] = raw[cols["group"]].astype(str) if cols.get("group") else pd.NA
++    out["intersectional"] = out["dimensions"].map(len) > 1
++    unmapped = sorted({l for ls in out["native_labels"] for l in ls} - set(lmap))
++    if unmapped:
++        print(f"[heseia] {len(unmapped)} native labels kept as their own dimension (unmapped): {unmapped[:15]}")
++    return out.drop_duplicates("text").reset_index(drop=True)
+diff --git a/src/benchbias/identity_probes.py b/src/benchbias/identity_probes.py
+new file mode 100644
+index 0000000..a373cca
+--- /dev/null
++++ b/src/benchbias/identity_probes.py
+@@ -0,0 +1,141 @@
++"""Identity-dimension probes on frozen sentence embeddings.
++
++One binary logistic-regression probe per identity dimension (one-vs-rest, multi-label), trained on a
++community-built benchmark (HESEIA) as the *reference frame*, then applied to other benchmarks' items and
++aggregated per cluster: "which community-defined dimension drives this cluster?"
++
++Safeguards built in:
++  - grouped cross-validation (no near-duplicates / templates across folds)
++  - control task (Hewitt & Liang, 2019): same probe on permuted labels -> selectivity = AUC - control AUC
++  - transfer check: a probe's AUC on the target benchmark's own (harmonized) labels, before its
++    projections are interpreted there (language and format shift)
++"""
++from __future__ import annotations
++
++import numpy as np
++import pandas as pd
++from sklearn.linear_model import LogisticRegression
++from sklearn.metrics import f1_score, roc_auc_score
++from sklearn.model_selection import GroupKFold, KFold
++
++
++def _clf(C: float = 1.0):
++    return LogisticRegression(max_iter=3000, class_weight="balanced", C=C)
++
++
++def multi_hot(label_lists, dimensions=None) -> pd.DataFrame:
++    """List-of-labels per item -> binary item x dimension matrix (supports intersectional multi-labels)."""
++    dims = dimensions or sorted({d for labels in label_lists for d in labels})
++    return pd.DataFrame([[int(d in set(labels)) for d in dims] for labels in label_lists], columns=dims)
++
++
++def _folds(n, groups, n_splits, seed):
++    if groups is not None:
++        return list(GroupKFold(n_splits).split(np.zeros(n), groups=groups))
++    return list(KFold(n_splits, shuffle=True, random_state=seed).split(np.zeros(n)))
++
++
++def evaluate_probes(X: np.ndarray, Y: pd.DataFrame, groups=None, n_splits: int = 5, C: float = 1.0,
++                    seed: int = 42, min_pos: int = 20) -> pd.DataFrame:
++    """Cross-validated AUC/F1 per dimension, plus control-task AUC and selectivity."""
++    rng = np.random.default_rng(seed)
++    folds = _folds(len(X), None if groups is None else np.asarray(groups), n_splits, seed)
++    rows = []
++    for dim in Y.columns:
++        y = Y[dim].to_numpy()
++        if y.sum() < min_pos:
++            rows.append(dict(dimension=dim, n_pos=int(y.sum()), note=f"< {min_pos} positives, skipped"))
++            continue
++        y_ctrl = rng.permutation(y)  # control task: same base rate, no relation to content
++        p, p_ctrl = np.zeros(len(y)), np.zeros(len(y))
++        for tr, te in folds:
++            if len(set(y[tr])) < 2:
++                continue
++            p[te] = _clf(C).fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
++            p_ctrl[te] = _clf(C).fit(X[tr], y_ctrl[tr]).predict_proba(X[te])[:, 1]
++        auc, auc_c = roc_auc_score(y, p), roc_auc_score(y_ctrl, p_ctrl)
++        rows.append(dict(dimension=dim, n_pos=int(y.sum()), AUC=auc, F1=f1_score(y, p > 0.5),
++                         control_AUC=auc_c, selectivity=auc - auc_c))
++    return pd.DataFrame(rows).set_index("dimension").round(3)
++
++
++def fit_probes(X: np.ndarray, Y: pd.DataFrame, C: float = 1.0, min_pos: int = 20) -> dict:
++    """Fit one probe per dimension on all data. Returns {dimension: fitted LogisticRegression}."""
++    return {d: _clf(C).fit(X, Y[d].to_numpy()) for d in Y.columns if Y[d].sum() >= min_pos}
++
++
++def directions(probes: dict) -> pd.DataFrame:
++    """Unit-norm probe weight vectors (dimension x embedding dim)."""
++    W = np.vstack([p.coef_[0] for p in probes.values()])
++    return pd.DataFrame(W / np.linalg.norm(W, axis=1, keepdims=True), index=list(probes))
++
++
++def direction_similarity(probes: dict) -> pd.DataFrame:
++    """Cosine similarity between probe directions: do e.g. gender and sexual orientation share a direction?"""
++    D = directions(probes)
++    return pd.DataFrame(D.values @ D.values.T, index=D.index, columns=D.index).round(3)
++
++
++def score(X: np.ndarray, probes: dict) -> pd.DataFrame:
++    """Per-item probability for each dimension (item x dimension)."""
++    return pd.DataFrame({d: p.predict_proba(X)[:, 1] for d, p in probes.items()})
++
++
++def transfer_check(scores: pd.DataFrame, target_labels, min_pos: int = 10) -> pd.DataFrame:
++    """AUC of each probe on a target benchmark whose items carry harmonized labels.
++
++    `target_labels`: one harmonized label per item (single-label) or a list per item (multi-label);
++    intersection labels like 'race_ethnicity×gender' count as positive for both parts.
++    """
++    def parts(lab):
++        labs = lab if isinstance(lab, (list, tuple, set)) else [lab]
++        return {p for l in labs if isinstance(l, str) for p in l.split("×")}
++
++    sets = [parts(l) for l in target_labels]
++    rows = []
++    for dim in scores.columns:
++        y = np.array([dim in s for s in sets], dtype=int)
++        if y.sum() < min_pos or y.sum() == len(y):
++            rows.append(dict(dimension=dim, n_pos=int(y.sum()), transfer_AUC=np.nan))
++            continue
++        rows.append(dict(dimension=dim, n_pos=int(y.sum()), transfer_AUC=roc_auc_score(y, scores[dim])))
++    return pd.DataFrame(rows).set_index("dimension").round(3)
++
++
++def cluster_profiles(scores: pd.DataFrame, clusters, native=None, usable=None) -> pd.DataFrame:
++    """Mean probe score per cluster, the dimension that 'drives' each cluster, and its margin.
++
++    usable : dimensions that passed the transfer check; others are excluded from the driver decision.
++    native : the benchmark's own category per item; adds the cluster's dominant native category.
++    """
++    cols = [c for c in scores.columns if usable is None or c in set(usable)]
++    df = scores[cols].assign(cluster=np.asarray(clusters))
++    df = df[df["cluster"] != -1]
++    prof = df.groupby("cluster")[cols].mean()
++    ranked = np.sort(prof.values, axis=1)
++    out = prof.round(3).assign(
++        size=df.groupby("cluster").size(),
++        driver=prof.idxmax(axis=1),
++        driver_margin=(ranked[:, -1] - ranked[:, -2]).round(3) if len(cols) > 1 else np.nan,
++    )
++    if native is not None:
++        nat = pd.Series(np.asarray(native), index=scores.index)[df.index]
++        out["native_dominant"] = nat.groupby(df["cluster"]).agg(lambda s: s.value_counts().idxmax())
++    return out
++
++
++def co_activation(scores: pd.DataFrame, mask, threshold: float = 0.5) -> pd.Series:
++    """Share of the selected items (e.g. intersectional ones) on which each pair of dimensions fires together."""
++    s = scores[np.asarray(mask)] > threshold
++    pairs = {f"{a} & {b}": float((s[a] & s[b]).mean())
++             for i, a in enumerate(s.columns) for b in s.columns[i + 1:]}
++    return pd.Series(pairs).sort_values(ascending=False).round(3)
++
++
++def center_by_group(X: np.ndarray, groups) -> np.ndarray:
++    """Subtract each group's mean embedding (e.g. per language) and re-normalize. Robustness check for
++    cross-lingual transfer: removes the language offset that would otherwise act like a dimension."""
++    X, groups = np.asarray(X, dtype=float).copy(), np.asarray(groups)
++    for g in np.unique(groups):
++        X[groups == g] -= X[groups == g].mean(axis=0)
++    return X / np.linalg.norm(X, axis=1, keepdims=True).clip(min=1e-12)
+diff --git a/tests/test_identity_probes.py b/tests/test_identity_probes.py
+new file mode 100644
+index 0000000..647eb2f
+--- /dev/null
++++ b/tests/test_identity_probes.py
+@@ -0,0 +1,88 @@
++"""Identity probes on synthetic embeddings where each dimension lives on its own axis."""
++import numpy as np
++import pandas as pd
++import pytest
++
++from benchbias import heseia
++from benchbias import identity_probes as ip
++
++DIMS = ["age", "gender", "race_ethnicity"]
++
++
++def _synthetic(n=600, seed=0):
++    rng = np.random.default_rng(seed)
++    labels = []
++    for _ in range(n):
++        k = rng.choice([1, 2], p=[0.7, 0.3])  # 30% intersectional items
++        labels.append(list(rng.choice(DIMS, size=k, replace=False)))
++    Y = ip.multi_hot(labels, DIMS)
++    X = rng.normal(scale=0.5, size=(n, 8))
++    X[:, :3] += Y.values * 2.0  # dimension d is encoded on axis d
++    return X, Y, labels
++
++
++def test_multi_hot_handles_intersections():
++    Y = ip.multi_hot([["age"], ["gender", "race_ethnicity"]], DIMS)
++    assert Y.values.tolist() == [[1, 0, 0], [0, 1, 1]]
++
++
++def test_evaluate_probes_selective():
++    X, Y, _ = _synthetic()
++    res = ip.evaluate_probes(X, Y, groups=np.arange(len(X)) % 50)
++    assert (res["AUC"] > 0.9).all()
++    assert (res["control_AUC"].between(0.35, 0.65)).all()
++    assert (res["selectivity"] > 0.3).all()
++
++
++def test_directions_orthogonal_for_independent_dims():
++    X, Y, _ = _synthetic()
++    sim = ip.direction_similarity(ip.fit_probes(X, Y))
++    off = sim.values[~np.eye(3, dtype=bool)]
++    assert np.abs(off).max() < 0.5 and np.allclose(np.diag(sim.values), 1)
++
++
++def test_transfer_check_splits_intersection_labels():
++    X, Y, _ = _synthetic()
++    probes = ip.fit_probes(X, Y)
++    Xt, Yt, labels = _synthetic(seed=1)
++    target = ["×".join(sorted(l)) for l in labels]  # e.g. 'gender×race_ethnicity'
++    res = ip.transfer_check(ip.score(Xt, probes), target)
++    assert (res["transfer_AUC"] > 0.9).all()
++
++
++def test_cluster_profiles_find_driver_and_respect_usable():
++    X, Y, labels = _synthetic()
++    S = ip.score(X, ip.fit_probes(X, Y))
++    clusters = np.array([DIMS.index(l[0]) for l in labels])
++    prof = ip.cluster_profiles(S, clusters, native=[l[0] for l in labels])
++    assert (prof["driver"] == prof["native_dominant"]).all()
++    prof2 = ip.cluster_profiles(S, clusters, usable=["age", "gender"])
++    assert set(prof2["driver"]) <= {"age", "gender"}
++
++
++def test_co_activation_on_intersectional_items():
++    X, Y, labels = _synthetic()
++    S = ip.score(X, ip.fit_probes(X, Y))
++    both = np.array([set(l) == {"gender", "race_ethnicity"} for l in labels])
++    co = ip.co_activation(S, both)
++    assert co.index[0] == "gender & race_ethnicity"
++
++
++def test_center_by_group_removes_offset():
++    rng = np.random.default_rng(0)
++    X = rng.normal(size=(200, 5)); X[:100] += 3
++    Xc = ip.center_by_group(X, np.repeat(["en", "es"], 100))
++    assert np.allclose(np.linalg.norm(Xc, axis=1), 1)
++    assert abs(Xc[:100].mean() - Xc[100:].mean()) < 0.2
++
++
++def test_heseia_label_parsing_and_mapping(tmp_path):
++    p = tmp_path / "h.csv"
++    pd.DataFrame({"oracion": ["Las mujeres no saben manejar.", "Los viejos no entienden la tecnología."],
++                  "tipo": ["Género", "edad, género"]}).to_csv(p, index=False)
++    df = heseia.load_heseia(p, columns={"text": "oracion", "labels": "tipo"},
++                            label_map={"género": "gender", "edad": "age"})
++    assert df["dimensions"].tolist() == [["gender"], ["age", "gender"]]
++    assert df["intersectional"].tolist() == [False, True]
++    with pytest.raises(ValueError):
++        heseia.load_heseia(p, columns={"text": None, "labels": None})
+-- 
+2.43.0
+
