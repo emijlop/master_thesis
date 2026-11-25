@@ -25,6 +25,8 @@ Benchmarks: **BBQ** (industry-adopted), **HESEIA** (community-built, Latin Ameri
 framing extraction → unit of analysis + normalization → frozen LaBSE embeddings
    → UMAP → HDBSCAN → coherence / convergence metrics → interpretation
                                 (Wallach et al. 2024; Shelby et al. 2023)
+Finettuning LaBSE -> method to test: either  freeze LaBSE and train a separate linear probe. Or you finetune it entirely, and then freeze and probe.
+                            
 ```
 
 Details and metric definitions: [`docs/research_design.md`](docs/research_design.md). Every methodological choice, with its reason: [`docs/decision_log.md`](docs/decision_log.md).
