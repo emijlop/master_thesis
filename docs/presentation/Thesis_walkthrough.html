@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thesis walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE work, a walkthrough to present from: calm, exact, a little playful in the pixels
+   IDEA Elena's CV poster: white sheet, one big blue circle, black type, plus pixel lettering stitched cell by cell
+   PICTURE the title drawn as outlined pixel cells across the blue circle; later the pipeline as stations
+   COLOUR white, black, one blue (#1a73e8 with the CV's navy and bright blue in the circle), greys
+   TYPE Silkscreen (pixel) for headings, Helvetica Neue for text, Space Mono for labels and questions
+   LAYOUT poster first screen with corner notes; checkered blue side bands; one reading column with wide tables */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0b0b0c);--ink:light-dark(#000000,#f4f4f4);--blue:light-dark(#1a73e8,#4d94ff);--mute:light-dark(#5f6368,#a5a8ad);--rule:light-dark(#dadce0,#2c2e33);--soft:light-dark(#f3f4f6,#17181b)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif;overflow-x:clip}
+h1,h2,h3{margin:0;font-family:Silkscreen,"Space Mono",monospace;font-weight:400;line-height:1.1;text-wrap:balance}
+h2{font-size:clamp(26px,3.4vw,38px);margin-bottom:18px}
+h3{font-size:19px;margin:26px 0 10px}
+p{margin:0 0 12px;max-width:68ch}
+a{color:var(--blue);text-underline-offset:3px}
+.mono{font-family:"Space Mono",monospace}
+.side{position:fixed;top:0;bottom:0;width:max(0px,min(150px,calc((100vw - 1140px)/2 - 28px)));background:repeating-conic-gradient(var(--blue) 0 25%,var(--bg) 0 50%) 0 0/14px 14px;z-index:0}
+.side.l{left:0}.side.r{right:0}
+.strip{height:14px;background:repeating-conic-gradient(var(--blue) 0 25%,var(--bg) 0 50%) 0 0/14px 14px;display:none}
+@media(max-width:1219px){.side{display:none}.strip{display:block}}
+main,header,footer{position:relative;z-index:1}
+.wrap{max-width:1060px;margin:0 auto;padding-inline:max(4vw,16px)}
+.hero{position:relative;display:grid;grid-template-rows:auto 1fr auto;min-height:min(100svh,860px);padding-block:26px}
+.corner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px}
+.corner b{font-family:Silkscreen,monospace;font-weight:400;font-size:17px}
+.stage{position:relative;display:grid;place-items:center;min-height:520px}
+.circle{position:absolute;width:min(80vw,660px,78svh);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 45%,#4285f4 0%,#1a73e8 52%,#0d47a1 100%)}
+.title{position:relative;width:100%;height:clamp(200px,27vw,270px)}
+.title svg{position:absolute;inset:0;width:100%;height:100%}
+.sub{position:relative;color:#fff;text-align:center;max-width:30ch;font-size:clamp(15px,1.6vw,18px);line-height:1.4;margin-top:-6px}
+.framing{position:relative;display:grid;justify-items:center;gap:12px;margin-top:4px;width:min(100%,560px)}
+.lead{position:relative;width:100%;height:clamp(84px,9vw,112px);margin-bottom:6px}
+.lead svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;gap:10px;width:100%}
+.card{background:#fff;color:#000;border:2px solid #000;padding:10px 12px;display:grid;gap:4px;align-content:start}
+.card svg{width:64px;height:38px}
+.card rect{fill:#fff;stroke:#000;stroke-width:1.4}
+.card rect.f{fill:#1a73e8}
+.card b{font:400 17px Silkscreen,"Space Mono",monospace}
+.card span{font:400 12.5px/1.45 "Space Mono",monospace}
+.x{align-self:center;font:400 15px Silkscreen,monospace;font-style:normal;background:#000;color:#fff;padding:6px 8px}
+.foot{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;font-size:14px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-block;background:var(--ink);color:var(--bg);font:700 14px "Space Mono",monospace;padding:9px 14px;text-decoration:none;white-space:nowrap}
+.btn:hover,.btn:focus-visible{background:var(--blue);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+nav.toc{position:sticky;top:0;z-index:5;background:var(--bg);border-block:2px solid var(--ink)}
+nav.toc .wrap{display:flex;gap:2px;overflow-x:auto;padding-block:8px}
+nav.toc a{flex:none;font:400 14px "Space Mono",monospace;color:var(--ink);text-decoration:none;padding:8px 10px;white-space:nowrap}
+nav.toc a:hover,nav.toc a:focus-visible{background:var(--ink);color:var(--bg)}
+section{padding-block:clamp(36px,5vw,64px);border-bottom:1px solid var(--rule)}
+.kicker{font:400 14px "Space Mono",monospace;color:var(--mute);margin-bottom:8px}
+.cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(20px,4vw,44px);align-items:start}
+@media(max-width:780px){.cols{grid-template-columns:minmax(0,1fr)}}
+.oq{border:2px solid var(--ink);padding:14px 16px 6px;margin-top:18px;background:var(--bg)}
+.oq header{display:flex;align-items:center;gap:10px;margin-bottom:8px;font:700 14px "Space Mono",monospace}
+.oq header i{font:400 20px Silkscreen,monospace;font-style:normal;display:grid;place-items:center;width:30px;height:30px;background:var(--blue);color:#fff}
+.oq ul{margin:0;padding-left:1.1em;font:400 15px/1.55 "Space Mono",monospace}
+.oq li{margin-bottom:8px}
+.lit{display:grid;grid-template-columns:repeat(auto-fit,minmax(15em,1fr));gap:14px}
+.lit div{border-top:2px solid var(--ink);padding-top:10px;font-size:15.5px}
+.lit b{display:block;font:400 16px Silkscreen,monospace;margin-bottom:6px}
+.levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:8px 0 6px}
+.levels div{padding:12px 12px 12px 0;border-top:4px solid var(--ink);font-size:15px}
+.levels div:nth-child(3){border-color:var(--blue)}
+.levels b{display:block;font:700 14px "Space Mono",monospace;margin-bottom:4px}
+@media(max-width:640px){.levels{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:9px 10px 9px 0;border-bottom:1px solid var(--rule)}
+th{font:700 13px "Space Mono",monospace;color:var(--mute);border-bottom:2px solid var(--ink)}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+code{font:.9em "Space Mono",monospace;background:var(--soft);padding:1px 5px;overflow-wrap:anywhere}
+.fig{position:relative;height:300px;margin-top:10px}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.fig text{font:400 13.5px "Space Mono",monospace;fill:var(--ink)}
+.fig text.t{font-weight:700}
+.fig text.w{fill:#fff}
+.fig g.node{cursor:pointer}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font:400 13.5px "Space Mono",monospace;color:var(--mute);margin-top:8px}
+.legend i{display:inline-block;width:14px;height:14px;margin-right:6px;vertical-align:-2px}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:14px;margin:4px 0 22px}
+.figs div{border-top:4px solid var(--ink);padding-top:8px}
+.figs div:first-child{border-color:var(--blue)}
+.figs b{display:block;font:400 clamp(30px,3.6vw,40px)/1.05 Silkscreen,monospace}
+.figs span{font-size:14px;color:var(--mute)}
+.bars{display:grid;grid-template-columns:max-content minmax(0,1fr) 3.6em;gap:6px 12px;align-items:center;font-size:14.5px}
+.bars .bar{height:14px;background:var(--blue)}
+.bars .bar.x{background:repeating-conic-gradient(var(--blue) 0 25%,var(--bg) 0 50%) 0 0/7px 7px}
+.bars .n{text-align:right;font-variant-numeric:tabular-nums}
+.nbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(16em,1fr));gap:14px}
+.nb{border:2px solid var(--ink);padding:16px;display:flex;flex-direction:column;gap:10px}
+.nb b{font:400 18px Silkscreen,monospace}
+.nb p{font-size:15px;margin:0;flex:1}
+.nb .state{font:400 13px "Space Mono",monospace;color:var(--mute)}
+details.all{border:2px solid var(--ink);padding:12px 16px}
+details.all summary{cursor:pointer;font:700 15px "Space Mono",monospace}
+details.all ol{font:400 14.5px/1.55 "Space Mono",monospace;padding-left:1.4em}
+details.all li{margin-bottom:6px}
+details.all li span{color:var(--mute)}
+.note{font-size:14px;color:var(--mute)}
+footer{padding-block:28px;font-size:14px;color:var(--mute)}
+@media(max-width:600px){table{font-size:13.5px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--rule)}.stack td{display:grid;grid-template-columns:6.8em minmax(0,1fr);gap:8px;border:0;padding:3px 0}.stack td::before{content:attr(data-l);font:700 12.5px "Space Mono",monospace;color:var(--mute)}.fig{height:600px}.stage{min-height:640px}.circle{width:min(94vw,470px)}.title{height:230px}.lead{height:118px}.vs{grid-template-columns:minmax(0,1fr)}.x{justify-self:center}.card{padding:8px 10px}.corner .mono{text-align:left!important}}
+@media(prefers-reduced-motion:no-preference){.title rect{animation:pop .5s both;animation-delay:calc(var(--d)*1ms)}@keyframes pop{from{opacity:0}to{opacity:1}}}
+</style>
+</head>
+<body>
+<div class="side l" aria-hidden="true"></div><div class="side r" aria-hidden="true"></div>
+<div class="strip" aria-hidden="true"></div>
+
+<header class="wrap hero">
+  <div class="corner"><div><b>Elena Mijares Lopez</b><br>Master thesis, Data Science Lab, Hertie School</div><div class="mono" style="text-align:right">Berlin, November 2026<br>Draft for feedback</div></div>
+  <div class="stage">
+    <div class="circle" aria-hidden="true"></div>
+    <div style="position:relative;width:100%;display:grid;justify-items:center">
+      <div class="title" role="img" aria-label="Same category, different territory"><svg id="tsvg"></svg></div>
+      <div class="framing">
+        <div class="lead" role="img" aria-label="Framings of social bias in LLM benchmarks"><svg id="lsvg"></svg></div>
+        <div class="vs">
+          <div class="card">
+            <svg viewBox="0 0 58 36" aria-hidden="true"><rect x="2" y="2" width="9" height="9"/><rect x="13" y="2" width="9" height="9"/><rect x="24" y="2" width="9" height="9"/><rect x="35" y="2" width="9" height="9"/><rect x="46" y="2" width="9" height="9"/><rect x="2" y="13" width="9" height="9"/><rect x="13" y="13" width="9" height="9"/><rect x="24" y="13" width="9" height="9"/><rect x="35" y="13" width="9" height="9"/><rect x="46" y="13" width="9" height="9"/><rect x="2" y="24" width="9" height="9"/><rect x="13" y="24" width="9" height="9"/><rect x="24" y="24" width="9" height="9"/><rect x="35" y="24" width="9" height="9"/><rect x="46" y="24" width="9" height="9"/></svg>
+            <b>Institutional</b>
+            <span>BBQ · adopted by industry · ~325 U.S. templates · 9 fixed axes</span>
+          </div>
+          <i class="x">vs</i>
+          <div class="card">
+            <svg viewBox="0 0 64 40" aria-hidden="true"><rect x="4" y="14" width="9" height="9"/><rect x="14" y="6" width="9" height="9" class="f"/><rect x="22" y="16" width="9" height="9"/><rect x="30" y="4" width="9" height="9"/><rect x="34" y="20" width="9" height="9" class="f"/><rect x="44" y="10" width="9" height="9"/><rect x="48" y="24" width="9" height="9"/><rect x="10" y="26" width="9" height="9" class="f"/><rect x="26" y="28" width="9" height="9"/><rect x="40" y="30" width="9" height="9" class="f"/><rect x="54" y="4" width="9" height="9" class="f"/><rect x="18" y="22" width="9" height="9"/></svg>
+            <b>Community</b>
+            <span>HESEIA · co-designed in Argentinian schools · intersecting labels</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <div class="mono" style="max-width:38ch">Supervisor: Dr. Drew Dimmery<br>Advisors: Dr. Angelie Kraft, Laura Pföhler</div>
+    <div class="btns"><a class="btn" href="#pipeline">Pipeline</a><a class="btn" href="#results">First results</a><a class="btn ghost" href="#all-questions">Open questions</a></div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sections"><div class="wrap">
+  <a href="#motivation">Motivation</a><a href="#literature">Literature</a><a href="#construct">Construct</a><a href="#instrument">Instrument</a><a href="#theory">Theory</a><a href="#method">Method</a><a href="#data">Data</a><a href="#pipeline">Pipeline</a><a href="#results">Results</a><a href="#notebooks">Notebooks</a><a href="#all-questions">Questions</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="motivation" class="cols">
+  <div>
+    <div class="kicker">Motivation</div>
+    <h2>Same label, possibly different construct</h2>
+    <p>Benchmarks are the main instrument for comparing LLM behaviour, yet they are better understood as artifacts of the institutions that build them than as neutral measures (Raji et al., 2021; Branford &amp; Kraft, 2026). Bias benchmarks are built by industry, academia and affected communities, each with its own idea of what a social bias is (Blodgett et al., 2021).</p>
+    <p>BBQ, which commercial model evaluations still report, defines nine U.S.-centric dimensions. Community-built benchmarks such as HESEIA and WinoQueer stay close to lived experience but rarely enter industry evaluation loops. The thesis asks whether benchmarks that use the same category names actually measure the same thing.</p>
+  </div>
+  <div>
+    <h3 style="margin-top:0">Research question</h3>
+    <p>Do institutional and community-built bias benchmarks operationalize the same demographic and intersecting constructs at the level of dataset content?</p>
+    <table><tbody>
+      <tr><td><b class="mono">RQ1</b></td><td>Internal coherence: does each benchmark's own category form a coherent cluster of content?</td></tr>
+      <tr><td><b class="mono">RQ2</b></td><td>Convergence: do same-labelled categories from different benchmarks land in the same semantic region?</td></tr>
+      <tr><td><b class="mono">RQ3</b></td><td>Origin: does the community-built benchmark cover territory that institutional ones leave out?</td></tr>
+    </tbody></table>
+    <div class="oq"><header><i>?</i>Open question</header><ul>
+      <li>BBQ was built by academics but is adopted by industry. Is "institutional vs. community" the right contrast, or should origin be "where it is used" rather than "who built it"?</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="literature">
+  <div class="kicker">Relevant literature</div>
+  <h2>Three strands meet in this thesis</h2>
+  <div class="lit">
+    <div><b>Bias measurement is contested</b>Definitions of "bias" are vague and inconsistent across NLP papers (Blodgett et al., 2020), benchmarks carry construction pitfalls (Blodgett et al., 2021), and BBQ shows selection and omitted-variable bias (Powers et al., 2024).</div>
+    <div><b>Benchmark content diverges</b>Same-named classes are incompatible across hate-speech datasets (Fortuna et al., 2020). StereoSet and CrowS-Pairs cover different facets of gender stereotypes (Zakizadeh &amp; Pilehvar, 2025). Construction choices alone shift bias scores (Selvam et al., 2023). QA benchmarks under-represent demographics and regions (Kraft et al., 2025).</div>
+    <div><b>Clustering as measurement</b>SOFA clusters stereotype content with embeddings, UMAP and HDBSCAN (Marchiori Manerba et al., 2024). Text-as-data work treats such output as a measure that needs validation (Grimmer &amp; Stewart, 2013; Ying et al., 2022; Nelson, 2020).</div>
+  </div>
+  <p style="margin-top:18px"><b>Gap:</b> to my knowledge, no work compares the semantic structure of bias-benchmark content against the benchmarks' stated categories, across institutional and community-built benchmarks and across languages.</p>
+  <div class="oq"><header><i>?</i>Open question</header><ul>
+    <li>Do you know NLP work that already clusters or probes bias-benchmark items across benchmarks? I'd like to check the gap claim before writing it.</li>
+  </ul></div>
+</section>
+
+<section id="construct" class="cols">
+  <div>
+    <div class="kicker">Construct</div>
+    <h2>Content validity of social-bias categories</h2>
+    <p>Each benchmark category (gender, race, religion, …) is a systematized version of a contested background concept. Following Jacobs &amp; Wallach (2021) and Wallach et al. (2025), the thesis examines <b>content validity</b>: whether an operationalization captures the substantive nature of the construct it claims to measure.</p>
+    <table class="stack"><thead><tr><th>Facet</th><th>Asks</th><th>Addressed by</th></tr></thead><tbody>
+      <tr><td data-l="Facet"><b>Contestedness</b></td><td data-l="Asks">Do authors systematize the same concept differently?</td><td data-l="By">Framing extraction</td></tr>
+      <tr><td data-l="Facet"><b>Substantive</b></td><td data-l="Asks">Is the relevant content included, and only that?</td><td data-l="By">RQ1, RQ3</td></tr>
+      <tr><td data-l="Facet"><b>Structural</b></td><td data-l="Asks">Are relations between constructs preserved?</td><td data-l="By">RQ2, intersectional items</td></tr>
+    </tbody></table>
+  </div>
+  <div>
+    <div class="oq" style="margin-top:0"><header><i>?</i>Open questions</header><ul>
+      <li>Can structural validity (e.g. how gender identity relates to sexual orientation) be read from embedding geometry at all, or only qualitatively?</li>
+      <li>Is the facet-to-RQ mapping convincing, or should it stay an explicitly exploratory hypothesis?</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="instrument">
+  <div class="kicker">Measurement instrument</div>
+  <h2>Two instruments: the benchmark, and my pipeline that audits it</h2>
+  <p>Wallach et al. (2024), following Adcock &amp; Collier (2001), separate four levels. A bias benchmark is the <b>instrument</b> at level three, and the thesis examines that level's content. Because the clustering pipeline produces the evidence about the benchmarks, it is itself an instrument and has to be validated in its own right.</p>
+  <div class="levels">
+    <div><b>Background concept</b>e.g. gender as a social construction</div>
+    <div><b>Systematized concept</b>a benchmark's stated category definition</div>
+    <div><b>Instrument</b>the benchmark's items: what this thesis audits</div>
+    <div><b>Measurements</b>model scores on the benchmark (not studied here)</div>
+  </div>
+  <div class="oq"><header><i>?</i>Open question</header><ul>
+    <li>Unit of analysis across formats: BBQ is QA scenarios, HESEIA stereotype sentences, WinoBias coreference sentences. Is "ambiguous context + negative question" comparable enough to a HESEIA sentence, or should every benchmark be reduced to a stereotype statement first?</li>
+  </ul></div>
+</section>
+
+<section id="theory" class="cols">
+  <div>
+    <div class="kicker">Theoretical approach</div>
+    <h2>Intersectional and decolonial feminist lens</h2>
+    <p>Demographic axes are treated as socially constructed classifications, not fixed variables. Gender and sexuality are read through decolonial feminism, as categories imposed through colonization (Lugones, 2010). Intersectionality means axes are co-constituted, not additive (Crenshaw, 1989). Data feminism asks to rethink binaries and hierarchies in data (Klein &amp; D'Ignazio, 2024).</p>
+    <p>Empirically, this becomes one testable contrast: do a benchmark's intersectional items form their own territory (co-constitutive), or fall inside one parent axis (additive)?</p>
+  </div>
+  <div>
+    <div class="oq" style="margin-top:0"><header><i>?</i>Open questions</header><ul>
+      <li>Co-occurring labels (HESEIA) or two-axis categories (BBQ's Race×Gender) are a thin operationalization of intersectionality. Is there a better computational handle?</li>
+      <li>How many axes to analyse: all eleven, or the four that every benchmark shares (age, gender, disability, race)?</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="kicker">Methodology and justification</div>
+  <h2>Each step has a precedent and a check</h2>
+  <p>The overall design follows computational grounded theory (Nelson, 2020): clusters detect patterns, close reading interprets them, and classifiers plus sensitivity checks confirm them.</p>
+  <div class="scroll"><table class="stack"><thead><tr><th>Step</th><th>Choice</th><th>Justification</th><th>Check</th></tr></thead><tbody id="methodrows"></tbody></table></div>
+  <div class="oq"><header><i>?</i>Open questions for NLP expertise</header><ul>
+    <li>LaBSE is trained for translation retrieval, not semantic similarity. Is it defensible as the main encoder, with multilingual mpnet as a check, or should it be the other way round?</li>
+    <li>Fine-tuning: is fine-tuned LaBSE (e.g. SetFit) worth running as a robustness comparison, given that clustering in a fine-tuned space would be circular?</li>
+    <li>UMAP to 5 dimensions (mine) or 15 (SOFA), and min_cluster_size fixed at 10 or scaled to ~1% of the corpus?</li>
+    <li>Are the probe thresholds sensible: AUC ≥ 0.75, selectivity ≥ 0.20, transfer AUC ≥ 0.70?</li>
+  </ul></div>
+</section>
+
+<section id="data">
+  <div class="kicker">Data</div>
+  <h2>Three benchmarks, two controls</h2>
+  <div class="scroll"><table class="stack"><thead><tr><th>Benchmark</th><th>Origin</th><th>Language</th><th>Format</th><th>Size</th><th>Role</th></tr></thead><tbody id="datarows"></tbody></table></div>
+  <div class="oq"><header><i>?</i>Open questions</header><ul>
+    <li>The downloadable HESEIA CSV is listed at 235 KB, which seems small for 46,499 sentences. Is it the full dataset?</li>
+    <li>Merged corpus for RQ2/RQ3: equal samples per benchmark and category, or proportional?</li>
+    <li>How should multi-label HESEIA items count in purity and dispersion metrics?</li>
+  </ul></div>
+</section>
+
+<section id="pipeline">
+  <div class="kicker">Pipeline</div>
+  <h2>Two branches share one frozen embedding space</h2>
+  <p>Branch A clusters items without labels. Branch B trains one probe per identity dimension on HESEIA, the community reference frame. They meet when the probes are projected onto the clusters: which dimension, from the community's standpoint, drives each BBQ cluster?</p>
+  <div class="fig" role="img" aria-label="Pipeline diagram: framing, units, frozen LaBSE; branch A clustering and coherence; branch B probes and transfer; then projection, robustness, interpretation"><svg id="psvg"></svg></div>
+  <div class="legend"><span><i style="box-shadow:inset 0 0 0 2px var(--ink)"></i>shared steps</span><span><i style="background:var(--blue)"></i>notebook 01, clustering</span><span><i style="background:repeating-conic-gradient(var(--blue) 0 25%,var(--bg) 0 50%) 0 0/7px 7px"></i>notebook 02, probes</span><span>Click a step to open its notebook.</span></div>
+</section>
+
+<section id="results">
+  <div class="kicker">First results · notebook 00</div>
+  <h2>The first run found BBQ's templates, not its categories</h2>
+  <div class="figs">
+    <div><b>14,187</b><span>unique disambiguated contexts</span></div>
+    <div><b>449</b><span>topics at min_topic_size 10, incl. noise</span></div>
+    <div><b>≈325</b><span>hand-written templates in BBQ</span></div>
+    <div><b>17×</b><span>Race×Gender vs. sexual orientation items</span></div>
+  </div>
+  <div class="cols">
+    <div>
+      <h3 style="margin-top:0">Items per category are uneven</h3>
+      <div class="bars" id="cats"></div>
+      <p class="note" style="margin-top:10px">Checkered bars: BBQ's two intersectional categories.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">The largest topics read like single scenarios</h3>
+      <div class="scroll"><table class="stack"><thead><tr><th>Topic</th><th>Items</th><th>Top keywords</th></tr></thead><tbody id="topics"></tbody></table></div>
+    </div>
+  </div>
+  <p style="margin-top:18px">With BERTopic's defaults (English all-MiniLM-L6-v2), 610 items (4.3%) were noise; raising min_topic_size to 25 gave 31 topics. The topic count sits near BBQ's template count, and keywords such as "card, pulled, snap, amex" describe one SES scenario about paying with a SNAP card. If clusters are templates, RQ1 looks perfectly coherent for a trivial reason. Notebook 01 therefore changes the encoder, the text unit and the template control, and scores clusters against template IDs to test this.</p>
+  <div class="oq"><header><i>?</i>Open questions</header><ul>
+    <li>Is scoring clusters against template IDs enough, or should RQ1 also be run with one item per template?</li>
+    <li>Masking replaces the two target people with "Person A / B". Does that remove enough identity signal, or do occupations and names left in the text still give the category away?</li>
+  </ul></div>
+</section>
+
+<section id="notebooks">
+  <div class="kicker">Notebooks</div>
+  <h2>Where the analysis lives</h2>
+  <div class="nbs" id="nbcards"></div>
+  <p class="note" style="margin-top:14px">Shared code is in <code>src/benchbias/</code>; every methodological choice and its reason is in <code>docs/decision_log.md</code>.</p>
+</section>
+
+<section id="all-questions" style="border:0">
+  <div class="kicker">For the meeting</div>
+  <h2>All open questions in one list</h2>
+  <details class="all" open><summary id="qcount">Open questions</summary><ol id="qlist"></ol></details>
+</section>
+
+</main>
+
+<footer class="wrap">Figures in "First results" come from the outputs of notebook 00. Template count as reported by Parrish et al. (2022). Repository: <a href="https://github.com/emijlop/master_thesis">github.com/emijlop/master_thesis</a></footer>
+
+<script>
+{
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GH="https://github.com/emijlop/master_thesis/blob/main/notebooks/";
+const CO="https://colab.research.google.com/github/emijlop/master_thesis/blob/main/notebooks/";
+
+const G={A:".###.|#...#|#...#|#####|#...#|#...#|#...#",C:".###.|#...#|#....|#....|#....|#...#|.###.",D:"####.|#...#|#...#|#...#|#...#|#...#|####.",E:"#####|#....|#....|####.|#....|#....|#####",F:"#####|#....|#....|####.|#....|#....|#....",G:".###.|#...#|#....|#.###|#...#|#...#|.###.",I:".###.|..#..|..#..|..#..|..#..|..#..|.###.",M:"#...#|##.##|#.#.#|#.#.#|#...#|#...#|#...#",N:"#...#|##..#|#.#.#|#..##|#...#|#...#|#...#",O:".###.|#...#|#...#|#...#|#...#|#...#|.###.",R:"####.|#...#|#...#|####.|#.#..|#..#.|#...#",S:".####|#....|#....|.###.|....#|....#|####.",T:"#####|..#..|..#..|..#..|..#..|..#..|..#..",Y:"#...#|#...#|.#.#.|..#..|..#..|..#..|..#..",",":".....|.....|.....|.....|.....|..#..|.#...",L:"#....|#....|#....|#....|#....|#....|#####",B:"####.|#...#|#...#|####.|#...#|#...#|####.",H:"#...#|#...#|#...#|#####|#...#|#...#|#...#",K:"#...#|#..#.|#.#..|##...|#.#..|#..#.|#...#"};
+/* pixel lettering: lines are arrays of [text, highlighted] segments */
+const pixel=(svg,lines,widthShare,animate)=>{
+  const W=svg.clientWidth,H=svg.clientHeight; if(!W||!H) return;
+  const len=l=>l.reduce((a,[t])=>a+t.length,0)*6-1;
+  const cols=Math.max(...lines.map(len)), rows=lines.length*9-2;
+  const c=Math.min(W*widthShare/cols,(H-4)/rows), ox=(W-cols*c)/2, oy=(H-rows*c)/2, sw=Math.max(.8,c*.14), sz=c*.84;
+  let out="",k=0;
+  lines.forEach((line,li)=>{
+    let col=(cols-len(line))/2;
+    line.forEach(([txt,hl])=>{
+      if(hl){const x0=ox+col*c-c*1.2,y0=oy+li*9*c-c*1.2,w=(txt.length*6-1)*c+c*2.4,h=7*c+c*2.4;
+        out+=`<rect x="${(x0+c*.8).toFixed(1)}" y="${(y0+c*.8).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="#000"/><rect x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="#fff" stroke="#000" stroke-width="${sw.toFixed(2)}"/>`;}
+      [...txt].forEach(ch=>{
+        const g=G[ch];
+        if(g) g.split("|").forEach((row,ry)=>[...row].forEach((v,rx)=>{
+          if(v!=="#") return;
+          const x=ox+(col+rx)*c+(c-sz)/2, y=oy+(li*9+ry)*c+(c-sz)/2;
+          out+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${sz.toFixed(1)}" height="${sz.toFixed(1)}" fill="${hl?"#000":"#fff"}" stroke="${hl?"#fff":"#000"}" stroke-width="${sw.toFixed(2)}"${animate?` style="--d:${(k++%60)*8}"`:""}/>`;
+        }));
+        col+=6;
+      });
+    });
+  });
+  svg.innerHTML=out;
+};
+const tsvg=document.getElementById("tsvg"), lsvg=document.getElementById("lsvg");
+const drawTitle=()=>{
+  const narrow=tsvg.clientWidth<640;
+  pixel(tsvg,(narrow?["SAME","CATEGORY,","DIFFERENT","TERRITORY"]:["SAME CATEGORY,","DIFFERENT","TERRITORY"]).map(t=>[[t,false]]),narrow?.86:.99,true);
+  pixel(lsvg,narrow?[[["FRAMINGS OF",false]],[["SOCIAL BIAS IN",false]],[["LLM BENCHMARKS",true]]]:[[["FRAMINGS OF SOCIAL BIAS IN",false]],[["LLM BENCHMARKS",true]]],narrow?.84:1.25,false);
+};
+const roT=new ResizeObserver(drawTitle); roT.observe(tsvg); roT.observe(lsvg); drawTitle();
+
+const method=[
+["Units","Ambiguous context + negative question; masked and unmasked views","Separates what is said from who is targeted","Mask coverage; cross-category duplicates"],
+["Embedding","Frozen LaBSE","Cross-lingual space for EN and ES (Feng et al., 2022); no encoder dominates all tasks (Muennighoff et al., 2023)","Second encoder: multilingual mpnet"],
+["Reduction + clustering","UMAP → HDBSCAN","Sequence used by SOFA (Marchiori Manerba et al., 2024); BERTopic (Grootendorst, 2022)","Grid over min_cluster_size × seeds; seed ARI"],
+["Coherence","Homogeneity, completeness","V-measure family (Rosenberg & Hirschberg, 2007)","Shuffled-label floor; template-ID comparison"],
+["Category probe","Logistic regression on BBQ categories","Linear separability of labelled content","Template-grouped CV (Hewitt & Liang, 2019)"],
+["Identity probes","One probe per dimension, trained on HESEIA","Community labels as reference frame","Control task, selectivity, transfer AUC, language centering"],
+["Interpretation","Close reading of clusters","Validation of topic labels (Ying et al., 2022; Grimmer & Stewart, 2013)","Hand-coded sample per cluster (planned)"]];
+document.getElementById("methodrows").innerHTML=method.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Step","Choice","Why","Check"][i]}">${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
+
+const data=[
+["BBQ","Industry-adopted (Parrish et al., 2022)","English, U.S.","QA scenarios from ~325 templates","58,492 items","Institutional framing"],
+["HESEIA","Community-built (Ivetta et al., 2025)","Spanish, Argentina","Stereotype sentences, multi-label","46,499 sentences","Community framing; probe training"],
+["WinoBias","Academic (Zhao et al., 2018)","English","Coreference, binary gender × 40 occupations","3,160 sentences","Academic framing"],
+["EsBBQ","Academic adaptation (Ruiz-Fernández et al., 2025)","Spanish, Spain","QA, as BBQ","","Language control"],
+["WinoQueer","Community-in-the-loop (Felkner et al., 2023)","English","Sentence pairs from 11 templates","45,540 pairs","Held-out check for probes"]];
+document.getElementById("datarows").innerHTML=data.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Benchmark","Origin","Language","Format","Size","Role"][i]}"${i===4?' class="num"':""}>${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
+
+const cats=[["Race × Gender",3710,1],["Race × SES",2738,1],["Race / ethnicity",1720],["SES",1612],["Gender identity",1418],["Age",920],["Nationality",770],["Physical appearance",394],["Disability",389],["Religion",300],["Sexual orientation",216]];
+document.getElementById("cats").innerHTML=cats.map(([n,v,x])=>`<span>${esc(n)}</span><div class="bar${x?" x":""}" style="width:${(v/cats[0][1]*100).toFixed(1)}%"></div><span class="n">${v.toLocaleString("en")}</span>`).join("");
+
+const topics=[[0,150,"teenagers, neighbors, windows, hanging"],[1,120,"demanding, preserve, forest, neighborhood"],[2,116,"card, pulled, snap, amex"],[3,112,"helpful, forgetting, mixing, raised"],[4,108,"comparing, graduated, failed, times"],[5,108,"contestants, contestant, worst, profession"]];
+document.getElementById("topics").innerHTML=topics.map(([t,n,k])=>`<tr><td data-l="Topic">${t}</td><td class="num" data-l="Items">${n}</td><td data-l="Keywords" style="color:var(--mute)">${esc(k)}</td></tr>`).join("");
+
+const nbs=[
+["00","Exploration","First BERTopic run with defaults on BBQ. Superseded; kept for the record.","00_exploration_bertopic_bbq.ipynb","Run, outputs saved"],
+["01","RQ1 coherence","BBQ in masked and unmasked views, coherence metrics, intersectionality, sensitivity grid, category probe.","01_bbq_rq1_internal_coherence.ipynb","Tested on synthetic data; next: run on BBQ"],
+["02","Identity probes","HESEIA-trained probes on frozen LaBSE, transfer to BBQ, cluster drivers, co-activation.","02_identity_probes.ipynb","Needs HESEIA columns and label map"]];
+document.getElementById("nbcards").innerHTML=nbs.map(([n,t,d,f,s])=>`<div class="nb"><b>${esc(n)} ${esc(t)}</b><p>${esc(d)}</p><span class="state">${esc(s)}</span><div class="btns"><a class="btn" href="${GH+f}">GitHub</a><a class="btn ghost" href="${CO+f}">Colab</a></div></div>`).join("");
+
+const qs=[...document.querySelectorAll("section[id]")].flatMap(s=>{const area=s.querySelector(".kicker")?.textContent||"";return [...s.querySelectorAll(".oq li")].map(li=>[area,li.textContent]);});
+document.getElementById("qlist").innerHTML=qs.map(([a,q])=>`<li><span>${esc(a)}:</span> ${esc(q)}</li>`).join("");
+document.getElementById("qcount").textContent=`${qs.length} open questions, grouped by section`;
+
+const nodes=[
+{t:"Framing",s:"stated labels",k:"s",c:0,l:0,go:"#construct"},
+{t:"Units",s:"two views",k:"s",c:1,l:0,go:GH+"01_bbq_rq1_internal_coherence.ipynb"},
+{t:"LaBSE",s:"frozen",k:"s",c:2,l:0,go:"#method"},
+{t:"Clustering",s:"UMAP, HDBSCAN",k:"a",c:3,l:-1,go:GH+"01_bbq_rq1_internal_coherence.ipynb"},
+{t:"Coherence",s:"vs. labels",k:"a",c:4,l:-1,go:GH+"01_bbq_rq1_internal_coherence.ipynb"},
+{t:"Probes",s:"on HESEIA",k:"b",c:3,l:1,go:GH+"02_identity_probes.ipynb"},
+{t:"Transfer",s:"to BBQ",k:"b",c:4,l:1,go:GH+"02_identity_probes.ipynb"},
+{t:"Projection",s:"drivers",k:"b",c:5,l:0,go:GH+"02_identity_probes.ipynb"},
+{t:"Robustness",s:"sensitivity",k:"s",c:6,l:0,go:"#method"},
+{t:"Reading",s:"validity",k:"s",c:7,l:0,go:"#construct"}];
+const edges=[[0,1],[1,2],[2,3],[3,4],[2,5],[5,6],[4,7],[6,7],[7,8],[8,9]];
+const psvg=document.getElementById("psvg");
+const drawPipe=()=>{
+  const W=psvg.clientWidth,H=psvg.clientHeight; if(!W||!H) return;
+  const wide=W>=700, n=8; let bw,bh,P;
+  if(wide){const cw=W/n; bw=Math.min(cw-12,140); bh=52; const L={"-1":H*.2,"0":H*.5,"1":H*.8}; P=nodes.map(d=>[cw*d.c+cw/2,L[d.l]]);}
+  else{const rh=H/n; bh=Math.min(rh-16,50); bw=Math.min(W/2-12,170); const L={"-1":W*.26,"0":W*.5,"1":W*.74}; P=nodes.map(d=>[L[d.l],rh*d.c+rh/2]);}
+  const path=(a,b)=>{const [x1,y1]=P[a],[x2,y2]=P[b];
+    if(wide){const sx=x1+bw/2,ex=x2-bw/2,mx=(sx+ex)/2;return `M${sx},${y1} C${mx},${y1} ${mx},${y2} ${ex},${y2}`;}
+    const sy=y1+bh/2,ey=y2-bh/2,my=(sy+ey)/2;return `M${x1},${sy} C${x1},${my} ${x2},${my} ${x2},${ey}`;};
+  const ink=getComputedStyle(document.body).color;
+  psvg.innerHTML=`<defs><pattern id="chk" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--bg)"/><rect width="4" height="4" fill="var(--blue)"/><rect x="4" y="4" width="4" height="4" fill="var(--blue)"/></pattern><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="${ink}"/></marker></defs>`+
+  edges.map(([a,b])=>`<path d="${path(a,b)}" fill="none" stroke="${nodes[a].k==="a"||nodes[b].k==="a"||nodes[b].k==="b"?"var(--blue)":ink}" stroke-width="2" marker-end="url(#ar)"/>`).join("")+
+  nodes.map((d,i)=>{const [x,y]=P[i];const fill=d.k==="a"?"var(--blue)":"var(--bg)";const cls=d.k==="a"?"w":"";
+    const tag=d.k==="b"?`<rect x="${x-bw/2}" y="${y-bh/2}" width="10" height="${bh}" fill="url(#chk)"/>`:"";
+    const dx=d.k==="b"?5:0;
+    return `<a href="${esc(d.go)}"${d.go.startsWith("#")?"":' target="_blank" rel="noopener"'}><g class="node"><rect x="${x-bw/2}" y="${y-bh/2}" width="${bw}" height="${bh}" fill="${fill}" stroke="${d.k==="s"?ink:"var(--blue)"}" stroke-width="2"/>${tag}<text class="t ${cls}" x="${x+dx}" y="${y-3}" text-anchor="middle">${esc(d.t)}</text><text class="${cls}" x="${x+dx}" y="${y+15}" text-anchor="middle" style="font-size:12.5px">${esc(d.s)}</text></g></a>`;}).join("");
+};
+const roP=new ResizeObserver(drawPipe); roP.observe(psvg); drawPipe();
+}
+</script>
+</body>
+</html>
