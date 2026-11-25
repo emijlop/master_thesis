@@ -22,12 +22,24 @@ Benchmarks: **BBQ** (industry-adopted), **HESEIA** (community-built, Latin Ameri
 ## Pipeline
 
 ```
-framing extraction → unit of analysis + normalization → frozen LaBSE embeddings
-   → UMAP → HDBSCAN → coherence / convergence metrics → interpretation
-                                (Wallach et al. 2024; Shelby et al. 2023)
-Finettuning LaBSE -> method to test: either  freeze LaBSE and train a separate linear probe. Or you finetune it entirely, and then freeze and probe.
-                            
+ 1  framing extraction            docs/benchmarks.md, docs/crosswalk.md
+ 2  units + normalization         bbq.py (masked / unmasked), heseia.py
+ 3  frozen LaBSE embeddings       embed.py   ── shared by both branches ──
+                                   │
+        ┌──────────────────────────┴──────────────────────────┐
+  4A UNSUPERVISED (nb 01)                          4B SUPERVISED (nb 02)
+     UMAP → HDBSCAN          cluster.py              identity probes trained on HESEIA
+     coherence metrics       metrics.py              (community labels = reference frame)
+     BBQ category probe      probe.py                quality · geometry · transfer to BBQ
+        └──────────────────────────┬──────────────────────────┘
+ 5  projection: probes → clusters  which dimension drives each cluster? co-activation
+ 6  robustness                     sensitivity grid · 2nd encoder · language centering
+                                   (optional) fine-tuned LaBSE, comparison only
+ 7  interpretation                 content validity: contestedness / substantive / structural
+                                   (Wallach et al. 2025; Shelby et al. 2023)
 ```
+
+LaBSE stays **frozen** in the main analysis: clustering in a space fine-tuned on identity labels would be circular. Fine-tuning (then freezing and probing) is only a robustness comparison; see `docs/decision_log.md`.
 
 Details and metric definitions: [`docs/research_design.md`](docs/research_design.md). Every methodological choice, with its reason: [`docs/decision_log.md`](docs/decision_log.md).
 
@@ -37,8 +49,10 @@ Details and metric definitions: [`docs/research_design.md`](docs/research_design
 notebooks/
   00_exploration_bertopic_bbq.ipynb     first BERTopic run (superseded, kept for the record)
   01_bbq_rq1_internal_coherence.ipynb   RQ1 on BBQ: masked/unmasked views, metrics, sensitivity, probe
+  02_identity_probes.ipynb              HESEIA-trained identity probes on frozen LaBSE -> which dimension drives each BBQ cluster
 src/benchbias/                           shared code imported by all notebooks
   bbq.py       loading, units, masking         metrics.py  RQ1 metrics
+  heseia.py    HESEIA loading, label mapping   identity_probes.py  per-dimension probes, transfer, cluster drivers
   embed.py     cached frozen embeddings        cluster.py  UMAP→HDBSCAN, sweep
   probe.py     template-grouped linear probe   plots.py    figures
   schema.py    common cross-benchmark schema + category crosswalks

@@ -4,6 +4,27 @@ One entry per methodological decision: what was decided, why, and what it affect
 
 ---
 
+### 2026-11-25 · Identity-dimension probes on frozen LaBSE (notebook 02)
+**Decision:** one linear (logistic) probe per identity dimension, trained on frozen LaBSE embeddings of **HESEIA**. The probes are applied to other benchmarks' items and averaged per cluster to find which dimension "drives" each cluster.
+**Why:**
+- It complements clustering (where items fall) with a labelled view (which dimension the content expresses).
+- HESEIA's community labels serve as the *reference frame*, not ground truth, consistent with the contestedness argument.
+- Linear probes keep the result interpretable: one direction per dimension.
+
+**Safeguards:**
+- grouped CV;
+- control task with selectivity (Hewitt & Liang, 2019);
+- transfer check against BBQ's own harmonized labels before interpreting projections;
+- masked vs. unmasked BBQ;
+- per-language centering;
+- thresholds fixed in advance (AUC ≥ 0.75, selectivity ≥ 0.2, transfer AUC ≥ 0.70).
+
+**Not chosen:**
+- *Fine-tuning LaBSE for the main analysis.* Clustering a space trained on identity labels would be circular. Fine-tuning (e.g. SetFit) stays an optional robustness comparison, and its embeddings are never used for clustering.
+- *Mixing HESEIA and WinoQueer as training data.* Probes would learn the dataset source, not the dimension. WinoQueer is better kept as a held-out check for sexual-orientation and gender-identity probes.
+
+**Open:** HESEIA column names and label map (fill after inspecting the CSV); grouping variable for CV.
+
 ### 2026-11-25 · De-duplicate within category, report cross-category duplicates
 **Decision:** masked/unmasked units are de-duplicated on `(category, text)`, not on text alone. Texts identical across categories are listed with `bbq.shared_texts()`.
 **Why:** de-duplicating on text alone silently deletes one category's items when two categories share an identical scenario after masking, e.g. Race×Gender vs. Race_ethnicity. That overlap is itself evidence that the category is carried only by the substituted label.
@@ -39,5 +60,6 @@ One entry per methodological decision: what was decided, why, and what it affect
 - [ ] HESEIA unit of analysis: single stereotype sentence? How to treat multi-label (intersectional) items in purity metrics?
 - [ ] HESEIA → harmonized category crosswalk (see `crosswalk.md`)
 - [ ] Merged-corpus sampling: equal per benchmark × category, or proportional?
-- [ ] Add EsBBQ as a language control (likely yes)
+- [ ] Add EsBBQ as a language control (likely yes; also needed to read probe transfer in notebook 02)
+- [ ] Optional: fine-tuned-encoder comparison for the probes (SetFit), only as a robustness check
 - [ ] Orphan-cluster threshold (90% single-benchmark?)

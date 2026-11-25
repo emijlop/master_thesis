@@ -16,16 +16,30 @@ Bias benchmarks are artifacts of the institutions that build them (Raji et al., 
 
 ## 3. Pipeline
 
-1. **Framing extraction** (qualitative): each benchmark's stated definitions and categories. Also count items vs. distinct templates per category.
+Two analytical branches share one frozen embedding space.
+
+1. **Framing extraction** (qualitative): each benchmark's stated definitions and categories. Also count items vs. distinct templates per category (`docs/benchmarks.md`, `docs/crosswalk.md`).
 2. **Unit of analysis and normalization.** BBQ: ambiguous context + negative question, in two views:
    - *unmasked*, identity terms kept: **who** the category targets;
    - *masked*, targets → Person A/B: **what** is said about them.
-   Masked texts are de-duplicated within each category, which collapses name substitutions to template level. Unmasked texts are capped at 6 per template.
-3. **Embedding:** `sentence-transformers/LaBSE`, frozen, L2-normalized. Robustness check: `paraphrase-multilingual-mpnet-base-v2`.
-4. **UMAP:** 5 dimensions, cosine, `n_neighbors=15`, `min_dist=0`, seeded.
-5. **HDBSCAN:** `min_cluster_size=10` by default, EOM selection. Sensitivity over {5, 10, 15, 25, 40} × 3 seeds.
-6. **Metrics** (below).
-7. **Interpretation:** substantive vs. structural validity (Wallach et al., 2024); representational-harm types (Shelby et al., 2023).
+   Masked texts are de-duplicated within each category, collapsing name substitutions to template level; unmasked texts are capped at 6 per template. HESEIA: one stereotype sentence per item, with its (possibly multiple) labels mapped to harmonized dimensions.
+3. **Embedding:** `sentence-transformers/LaBSE`, frozen, L2-normalized. Robustness: `paraphrase-multilingual-mpnet-base-v2`. Never fine-tuned for the main analysis.
+
+**Branch A: unsupervised (notebook 01, RQ1)**
+
+4A. UMAP (5 dimensions, cosine, `n_neighbors=15`, `min_dist=0`, seeded) → HDBSCAN (`min_cluster_size=10` by default, EOM selection).
+5A. Coherence metrics against each benchmark's own categories (§4), plus a linear probe on the benchmark's own categories with template-grouped CV.
+
+**Branch B: supervised reference frame (notebook 02)**
+
+4B. One logistic probe per identity dimension, trained on HESEIA (community labels as reference frame, not ground truth).
+5B. Probe quality (AUC, selectivity vs. control task), geometry (direction similarity), and transfer to BBQ's own labels.
+
+**Join**
+
+6. Probes from B are projected onto the clusters from A, giving each cluster's driving dimension and the co-activation of dimensions on intersectional items.
+7. **Robustness:** sensitivity grid (`min_cluster_size` × seeds, plus SOFA-style settings); second encoder; per-language centering; EsBBQ as language control; optional fine-tuned encoder as a comparison only.
+8. **Interpretation:** content validity facets (contestedness, substantive, structural; Wallach et al., 2025) and representational-harm types (Shelby et al., 2023).
 
 ## 4. Metrics
 
@@ -45,6 +59,15 @@ Reference points:
 
 **Linear probe:** multinomial logistic regression on frozen embeddings, with cross-validation **grouped by template**. The gap between random-split and grouped scores quantifies template leakage. The confusion matrix shows which categories the content fails to separate (structural validity).
 
+**Identity-dimension probes (notebook 02):** one logistic probe per dimension, trained on frozen LaBSE embeddings of HESEIA (community labels as reference frame). Reported per dimension:
+- cross-validated AUC and selectivity against a control task;
+- cosine similarity between probe directions (structural validity);
+- transfer AUC on BBQ's own labels (RQ2);
+- per-cluster driver dimension vs. BBQ's own category (RQ1/RQ2);
+- co-activation on intersectional items.
+
+Projections are interpreted only for dimensions that pass the thresholds fixed in the decision log.
+
 ## 5. Confounds to control before claiming erasure (RQ3)
 
 | Confound | Why it matters | Control |
@@ -53,3 +76,4 @@ Reference points:
 | Format | QA scenarios vs. stereotype statements vs. coreference sentences | report clusters that are single-benchmark *and* single-format; compare masked units; qualitative reading of orphans |
 | Size / redundancy | BBQ's 58k items come from ~325 templates | template-level normalization; balanced samples per category in the merged corpus |
 | Encoder | LaBSE is trained for translation retrieval, not similarity | repeat with an STS-trained multilingual encoder |
+| Probe shortcut | probes may read identity words or dataset style, not the dimension | control task / selectivity; masked BBQ; train on one dataset only; per-language centering |
