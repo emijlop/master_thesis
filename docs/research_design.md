@@ -68,6 +68,21 @@ Reference points:
 
 Projections are interpreted only for dimensions that pass the thresholds fixed in the decision log.
 
+## 4b. Statistical tests (`src/benchbias/stats.py`)
+
+The template, not the item, is the unit of independent information in BBQ (58,492 items from ~325 templates). All nulls reassign whole templates; all CIs resample templates; tests across categories or clusters are BH-corrected. Permutation p-values are (1 + #null ≥ observed) / (1 + B), with B = 999.
+
+| RQ | H0 | Statistic | Null / inference | Function |
+|---|---|---|---|---|
+| RQ1 | Given templates, category carries no information about cluster membership | AMI(category, cluster) | Template-level permutation (item-level shown for contrast) | `rq1_permutation_test` |
+| RQ1 | A category is no more internally similar than to the rest, beyond templates | Coherence gap Δ (within − between mean cosine similarity, full 768-d space) | Template-level permutation, BH across categories; template bootstrap CI | `rq1_gap_test`, `bootstrap_by_group` |
+| RQ2 | Category labels unrelated to content across benchmarks | Mean rank of the same-labelled category in the cross-benchmark distance matrix | Permute the other benchmark's labels (robust to global language/format offset) | `category_distance_matrix`, `label_match_test` |
+| RQ2 | Same-labelled categories have the same distribution | Unbiased MMD² (Gaussian kernel, median heuristic); C2ST balanced accuracy as effect size | Permutation; grouped CV for C2ST | `mmd_test`, `c2st` |
+| RQ3 | Coverage is symmetric between institutional and community benchmark | k-NN manifold coverage Cov(I→H), asymmetry A = Cov(H→I) − Cov(I→H) | Bootstrap CI; EsBBQ as language-matched I | `manifold_coverage` |
+| RQ3 | No cluster over-represents one benchmark | Hypergeometric tail per cluster | BH; orphan = q < .05 and share ≥ .9 | `orphan_clusters` |
+
+Full formulas: `docs/statistical_tests_full.md`. The walkthrough page shows a pseudocode draft.
+
 ## 5. Confounds to control before claiming erasure (RQ3)
 
 | Confound | Why it matters | Control |

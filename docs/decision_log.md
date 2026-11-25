@@ -4,6 +4,25 @@ One entry per methodological decision: what was decided, why, and what it affect
 
 ---
 
+### 2026-11-25 · Inference at template level; run manifests
+**Decision:**
+- Every RQ gets an explicit H0 with a permutation or bootstrap procedure (`stats.py`).
+- Nulls permute whole templates.
+- RQ2 is tested by cross-benchmark label matching, with MMD and C2ST as secondary measures.
+- RQ3 is tested by k-NN manifold coverage and hypergeometric orphan clusters.
+- Every notebook run writes a `run_*.json` manifest (`runlog.py`) and saves all tables as CSV, tagged with `RUN`.
+
+**Why:**
+- Item-level nulls overstate significance when clusters follow templates. A unit test shows this: clusters equal to templates give p_item < .05 but p_template > .05.
+- Label matching is robust to a global language or format offset, which a plain two-sample test would always detect.
+- Manifests make results comparable across setups and document hardware and versions.
+
+**Open:**
+- Power for categories with few templates.
+- The choice of k for manifold coverage.
+
+**Presentation:** the walkthrough page shows these tests as pseudocode, marked as a draft. The full formal version is parked in `docs/statistical_tests_full.md`; consider including it in the thesis once the first runs confirm the design.
+
 ### 2026-11-25 · Identity-dimension probes on frozen LaBSE (notebook 02)
 **Decision:** one linear (logistic) probe per identity dimension, trained on frozen LaBSE embeddings of **HESEIA**. The probes are applied to other benchmarks' items and averaged per cluster to find which dimension "drives" each cluster.
 **Why:**

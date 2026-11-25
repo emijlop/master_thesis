@@ -53,6 +53,7 @@ notebooks/
 src/benchbias/                           shared code imported by all notebooks
   bbq.py       loading, units, masking         metrics.py  RQ1 metrics
   heseia.py    HESEIA loading, label mapping   identity_probes.py  per-dimension probes, transfer, cluster drivers
+  stats.py     hypothesis tests for RQ1-3      runlog.py   run manifest: hardware, versions, timings
   embed.py     cached frozen embeddings        cluster.py  UMAP→HDBSCAN, sweep
   probe.py     template-grouped linear probe   plots.py    figures
   schema.py    common cross-benchmark schema + category crosswalks
@@ -62,7 +63,7 @@ docs/
   decision_log.md      dated methodological decisions
   benchmarks.md        characteristics table of the benchmarks
   crosswalk.md         mapping of native categories to shared constructs
-  presentation/        material for presenting the project
+  presentation/        walkthrough page (Thesis_walkthrough.html)
 data/README.md         where each dataset comes from (no data committed)
 outputs/               generated tables, figures, embeddings (git-ignored)
 ```
