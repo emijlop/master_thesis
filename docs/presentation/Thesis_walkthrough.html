@@ -110,6 +110,27 @@ details.all ol{font:400 14.5px/1.55 "Space Mono",monospace;padding-left:1.4em}
 details.all li{margin-bottom:6px}
 details.all li span{color:var(--mute)}
 .note{font-size:14px;color:var(--mute)}
+.eq{overflow-x:auto;overflow-y:hidden;padding:6px 0;margin:4px 0 10px;max-width:100%}
+mjx-container[display="true"]{margin:0!important}
+.math-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,28em),1fr));gap:12px 28px}
+.math-grid>div{border-top:2px solid var(--ink);padding-top:10px}
+.math-grid b{display:block;font:400 16px Silkscreen,monospace;margin-bottom:4px}
+.math-grid p{font-size:15.5px}
+.test{border:2px solid var(--ink);margin-top:16px}
+.test>header{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;background:var(--ink);color:var(--bg);padding:8px 14px}
+.test>header b{font:400 18px Silkscreen,monospace}
+.test>header span{font:400 14px "Space Mono",monospace}
+.test dl{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:8px 16px;margin:0;padding:14px}
+.test dt{font:700 13.5px "Space Mono",monospace;color:var(--mute);padding-top:2px}
+.test dd{margin:0;font-size:15.5px}
+@media(max-width:600px){.test dl{grid-template-columns:minmax(0,1fr)}.test dt{padding-top:6px}}
+.pending{color:var(--mute);font-style:italic}
+.orange{--blue:light-dark(#f26b1d,#ff8f4d)}
+.orange h2{color:var(--blue)}
+.orange .kicker{color:var(--blue)}
+pre.pseudo{margin:6px 0 10px;padding:12px 14px;background:var(--soft);border-left:4px solid var(--blue);font:400 13.5px/1.55 "Space Mono",monospace;overflow-x:auto;white-space:pre}
+pre.pseudo .c{color:var(--mute)}
+.draft{display:inline-block;font:700 12.5px "Space Mono",monospace;background:#fff;color:#000;border:2px solid #000;padding:1px 8px;white-space:nowrap}
 footer{padding-block:28px;font-size:14px;color:var(--mute)}
 @media(max-width:600px){table{font-size:13.5px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--rule)}.stack td{display:grid;grid-template-columns:6.8em minmax(0,1fr);gap:8px;border:0;padding:3px 0}.stack td::before{content:attr(data-l);font:700 12.5px "Space Mono",monospace;color:var(--mute)}.fig{height:600px}.stage{min-height:640px}.circle{width:min(94vw,470px)}.title{height:230px}.lead{height:118px}.vs{grid-template-columns:minmax(0,1fr)}.x{justify-self:center}.card{padding:8px 10px}.corner .mono{text-align:left!important}}
 @media(prefers-reduced-motion:no-preference){.title rect{animation:pop .5s both;animation-delay:calc(var(--d)*1ms)}@keyframes pop{from{opacity:0}to{opacity:1}}}
@@ -150,7 +171,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
 </header>
 
 <nav class="toc" aria-label="Sections"><div class="wrap">
-  <a href="#motivation">Motivation</a><a href="#literature">Literature</a><a href="#construct">Construct</a><a href="#instrument">Instrument</a><a href="#theory">Theory</a><a href="#method">Method</a><a href="#data">Data</a><a href="#pipeline">Pipeline</a><a href="#results">Results</a><a href="#notebooks">Notebooks</a><a href="#all-questions">Questions</a>
+  <a href="#motivation">Motivation</a><a href="#literature">Literature</a><a href="#construct">Construct</a><a href="#instrument">Instrument</a><a href="#theory">Theory</a><a href="#method">Method</a><a href="#math">How it works</a><a href="#tests">Tests</a><a href="#data">Data</a><a href="#pipeline">Pipeline</a><a href="#results">Results</a><a href="#notebooks">Notebooks</a><a href="#compute">Compute</a><a href="#all-questions">Questions</a>
 </div></nav>
 
 <main class="wrap">
@@ -160,7 +181,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
     <div class="kicker">Motivation</div>
     <h2>Same label, possibly different construct</h2>
     <p>Benchmarks are the main instrument for comparing LLM behaviour, yet they are better understood as artifacts of the institutions that build them than as neutral measures (Raji et al., 2021; Branford &amp; Kraft, 2026). Bias benchmarks are built by industry, academia and affected communities, each with its own idea of what a social bias is (Blodgett et al., 2021).</p>
-    <p>BBQ, which commercial model evaluations still report, defines nine U.S.-centric dimensions. Community-built benchmarks such as HESEIA and WinoQueer stay close to lived experience but rarely enter industry evaluation loops. The thesis asks whether benchmarks that use the same category names actually measure the same thing.</p>
+    <p>BBQ, which commercial model evaluations still report, defines nine U.S.-centric dimensions. Community-built benchmarks such as HESEIA and WinoQueer stay close to lived experience but rarely enter industry evaluation loops. This thesis asks whether benchmarks that use the same category names actually measure the same thing.</p>
   </div>
   <div>
     <h3 style="margin-top:0">Research question</h3>
@@ -194,7 +215,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
   <div>
     <div class="kicker">Construct</div>
     <h2>Content validity of social-bias categories</h2>
-    <p>Each benchmark category (gender, race, religion, …) is a systematized version of a contested background concept. Following Jacobs &amp; Wallach (2021) and Wallach et al. (2025), the thesis examines <b>content validity</b>: whether an operationalization captures the substantive nature of the construct it claims to measure.</p>
+    <p>Each benchmark category (gender, race, religion, …) is a systematized version of a contested background concept. Following Jacobs &amp; Wallach (2021) and Wallach et al. (2025), this thesis examines <b>content validity</b>: whether an operationalization captures the substantive nature of the construct it claims to measure.</p>
     <table class="stack"><thead><tr><th>Facet</th><th>Asks</th><th>Addressed by</th></tr></thead><tbody>
       <tr><td data-l="Facet"><b>Contestedness</b></td><td data-l="Asks">Do authors systematize the same concept differently?</td><td data-l="By">Framing extraction</td></tr>
       <tr><td data-l="Facet"><b>Substantive</b></td><td data-l="Asks">Is the relevant content included, and only that?</td><td data-l="By">RQ1, RQ3</td></tr>
@@ -212,7 +233,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
 <section id="instrument">
   <div class="kicker">Measurement instrument</div>
   <h2>Two instruments: the benchmark, and my pipeline that audits it</h2>
-  <p>Wallach et al. (2024), following Adcock &amp; Collier (2001), separate four levels. A bias benchmark is the <b>instrument</b> at level three, and the thesis examines that level's content. Because the clustering pipeline produces the evidence about the benchmarks, it is itself an instrument and has to be validated in its own right.</p>
+  <p>Wallach et al. (2024), following Adcock &amp; Collier (2001), separate four levels. A bias benchmark is the <b>instrument</b> at level three, and this thesis examines that level's content. Because the clustering pipeline produces the evidence about the benchmarks, it is itself an instrument and has to be validated in its own right.</p>
   <div class="levels">
     <div><b>Background concept</b>e.g. gender as a social construction</div>
     <div><b>Systematized concept</b>a benchmark's stated category definition</div>
@@ -224,7 +245,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
   </ul></div>
 </section>
 
-<section id="theory" class="cols">
+<section id="theory" class="cols orange">
   <div>
     <div class="kicker">Theoretical approach</div>
     <h2>Intersectional and decolonial feminist lens</h2>
@@ -249,6 +270,98 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
     <li>Fine-tuning: is fine-tuned LaBSE (e.g. SetFit) worth running as a robustness comparison, given that clustering in a fine-tuned space would be circular?</li>
     <li>UMAP to 5 dimensions (mine) or 15 (SOFA), and min_cluster_size fixed at 10 or scaled to ~1% of the corpus?</li>
     <li>Are the probe thresholds sensible: AUC ≥ 0.75, selectivity ≥ 0.20, transfer AUC ≥ 0.70?</li>
+  </ul></div>
+</section>
+
+
+<section id="math">
+  <div class="kicker">How each step works</div>
+  <h2>The pipeline in pseudocode</h2>
+  <p>A conceptual version of what the code does. The formal notation is kept in <code>docs/statistical_tests_full.md</code> for later.</p>
+  <div class="math-grid">
+    <div><b>Embedding</b>
+<pre class="pseudo">for each item text s:
+    e = LaBSE(s)          <span class="c"># 768 numbers; LaBSE is never retrained</span>
+    e = e / length(e)     <span class="c"># so dot(e_i, e_j) = cosine similarity</span></pre>
+      <p>Similar meanings get nearby vectors, in English and Spanish alike.</p></div>
+    <div><b>UMAP</b>
+<pre class="pseudo">connect each item to its 15 nearest neighbours
+squeeze 768 dimensions into 5,
+    keeping neighbours close together
+<span class="c"># random start, so the seed is fixed</span></pre>
+      <p>Makes the space small enough for density-based clustering (McInnes et al., 2018).</p></div>
+    <div><b>HDBSCAN</b>
+<pre class="pseudo">find dense regions in the 5-d space
+keep a region as a cluster if it
+    stays stable across density levels
+    and has ≥ min_cluster_size items
+items in no dense region → noise (-1)</pre>
+      <p>The number of clusters is not fixed in advance (McInnes &amp; Healy, 2017).</p></div>
+    <div><b>Coherence</b>
+<pre class="pseudo">purity     = does each cluster hold one category?   <span class="c"># 0..1</span>
+dispersion = does each category stay in one cluster? <span class="c"># 0..1</span>
+gap = avg similarity within a category
+    - avg similarity across categories</pre>
+      <p>Purity and dispersion are homogeneity and completeness (Rosenberg &amp; Hirschberg, 2007). The gap uses the full space, so it doesn't depend on UMAP or HDBSCAN settings.</p></div>
+    <div><b>Identity probes</b>
+<pre class="pseudo">for each dimension d in HESEIA (age, gender, ...):
+    train logistic regression:
+        embedding → "is this item about d?"
+    quality     = AUC on held-out items
+    control     = same, with shuffled labels
+    selectivity = quality - control</pre>
+      <p>A probe only counts if it beats the shuffled control (Hewitt &amp; Liang, 2019).</p></div>
+    <div><b>Projection</b>
+<pre class="pseudo">for each BBQ cluster k:
+    score every item with every probe
+    profile(k) = average score per dimension
+    driver(k)  = dimension with the highest average</pre>
+      <p>Shows which HESEIA dimension, from the community's standpoint, a BBQ cluster is about.</p></div>
+  </div>
+  <div class="oq"><header><i>?</i>Open questions</header><ul>
+    <li>Is a linear probe enough to say a dimension is "represented" in the embeddings?</li>
+    <li>Is the average-similarity gap a good enough coherence measure, or does it miss how spread out a category is?</li>
+  </ul></div>
+</section>
+
+<section id="tests">
+  <div class="kicker">Hypotheses and tests · draft</div>
+  <h2>A first idea of how to test each sub-question</h2>
+  <p><span class="draft">Draft · not confirmed</span> These hypotheses and tests are a proposal to discuss, not a fixed design. One principle holds throughout: BBQ's items come from about 325 templates, so whole templates, not single items, are shuffled when building a "no effect" baseline.</p>
+
+  <div class="test"><header><b>RQ1</b><span>internal coherence · notebook 01, §5b</span></header><dl>
+    <dt>H0 <span class="draft">draft</span></dt><dd>Clusters follow BBQ's templates, not its categories: knowing an item's category adds nothing once its template is known.</dd>
+    <dt>Statistic</dt><dd>
+<pre class="pseudo">observed = agreement(clusters, categories)
+repeat 999 times:
+    shuffle categories between whole templates
+    null.append(agreement(clusters, shuffled))
+p = share of null ≥ observed</pre></dd>
+  </dl></div>
+
+  <div class="test"><header><b>RQ2</b><span>convergence · planned notebook 03</span></header><dl>
+    <dt>H0 <span class="draft">draft</span></dt><dd>A shared label does not mean shared content: BBQ's "gender" is no closer to HESEIA's "gender" than to any other HESEIA category.</dd>
+    <dt>Statistic</dt><dd>
+<pre class="pseudo">for each category c in both benchmarks:
+    distance from BBQ's c to every HESEIA category
+    rank of HESEIA's c among them   <span class="c"># 1 = closest</span>
+statistic = average rank
+compare with: average rank after shuffling HESEIA's labels</pre></dd>
+  </dl></div>
+
+  <div class="test"><header><b>RQ3</b><span>origin · planned notebook 03</span></header><dl>
+    <dt>H0 <span class="draft">draft</span></dt><dd>The institutional benchmark reaches as much of the community benchmark's content as the reverse.</dd>
+    <dt>Statistic</dt><dd>
+<pre class="pseudo">for each HESEIA item:
+    covered = lies within the neighbourhood of some BBQ item
+coverage(BBQ → HESEIA) = share of HESEIA items covered
+compare with coverage(HESEIA → BBQ)
+clusters with ≥ 90% HESEIA items → candidate "orphans"</pre></dd>
+  </dl></div>
+  <div class="oq"><header><i>?</i>Open questions</header><ul>
+    <li>Are these the right null hypotheses for each sub-question, or should they be framed differently?</li>
+    <li>Some BBQ categories have few templates (e.g. sexual orientation). Is there enough data to test them, or should they be described only?</li>
+    <li>RQ3: how to make sure "not covered" reflects content, not just the difference between Spanish and English?</li>
   </ul></div>
 </section>
 
@@ -292,6 +405,10 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
     </div>
   </div>
   <p style="margin-top:18px">With BERTopic's defaults (English all-MiniLM-L6-v2), 610 items (4.3%) were noise; raising min_topic_size to 25 gave 31 topics. The topic count sits near BBQ's template count, and keywords such as "card, pulled, snap, amex" describe one SES scenario about paying with a SNAP card. If clusters are templates, RQ1 looks perfectly coherent for a trivial reason. Notebook 01 therefore changes the encoder, the text unit and the template control, and scores clusters against template IDs to test this.</p>
+
+  <h3>Run plan before adding plots</h3>
+  <p>Plots of notebooks 01 and 02 will be added once these runs are done. Each run tags its files with <code>RUN</code> and writes a <code>run_*.json</code> manifest.</p>
+  <div class="scroll"><table class="stack"><thead><tr><th>Run</th><th>Notebook</th><th>Setting</th><th>Answers</th></tr></thead><tbody id="runrows"></tbody></table></div>
   <div class="oq"><header><i>?</i>Open questions</header><ul>
     <li>Is scoring clusters against template IDs enough, or should RQ1 also be run with one item per template?</li>
     <li>Masking replaces the two target people with "Person A / B". Does that remove enough identity signal, or do occupations and names left in the text still give the category away?</li>
@@ -305,6 +422,34 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
   <p class="note" style="margin-top:14px">Shared code is in <code>src/benchbias/</code>; every methodological choice and its reason is in <code>docs/decision_log.md</code>.</p>
 </section>
 
+
+<section id="compute">
+  <div class="kicker">Compute and reproducibility</div>
+  <h2>Every run records where and how it ran</h2>
+  <div class="cols">
+    <div>
+      <p>Each notebook writes <code>outputs/run_&lt;notebook&gt;_&lt;RUN&gt;_&lt;timestamp&gt;.json</code> through <code>benchbias.runlog</code>. The manifest is part of every result I share.</p>
+      <table><tbody id="manifest"></tbody></table>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Fixed by design</h3>
+      <table><tbody>
+        <tr><td>Encoder</td><td>LaBSE, frozen, 768-d; mpnet as a check</td></tr>
+        <tr><td>Seeds</td><td>42 for the main run; 0, 1, 2 in the sensitivity grid</td></tr>
+        <tr><td>Embeddings</td><td>Cached as <code>.npy</code>; every later step reuses them</td></tr>
+        <tr><td>Data</td><td>Not redistributed; sources and access dates in <code>data/README.md</code></td></tr>
+        <tr><td>Tests</td><td>27 unit tests on synthetic data, no downloads</td></tr>
+      </tbody></table>
+      <h3>Hardware</h3>
+      <p class="pending">Filled in from the first run manifest.</p>
+    </div>
+  </div>
+  <div class="oq"><header><i>?</i>Open questions</header><ul>
+    <li>Is Colab's GPU enough, or should the full grid run on a Hertie or lab machine? Embedding is the only heavy step; everything after reuses the cached vectors.</li>
+    <li>Should the cached embeddings be archived (e.g. Zenodo) so results can be reproduced without re-encoding?</li>
+  </ul></div>
+</section>
+
 <section id="all-questions" style="border:0">
   <div class="kicker">For the meeting</div>
   <h2>All open questions in one list</h2>
@@ -313,7 +458,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
 
 </main>
 
-<footer class="wrap">Figures in "First results" come from the outputs of notebook 00. Template count as reported by Parrish et al. (2022). Repository: <a href="https://github.com/emijlop/master_thesis">github.com/emijlop/master_thesis</a></footer>
+<footer class="wrap">Figures in "First results" come from the outputs of notebook 00. Test code is in <code>src/benchbias/stats.py</code>; the formal version is in <code>docs/statistical_tests_full.md</code>. Template count as reported by Parrish et al. (2022). Repository: <a href="https://github.com/emijlop/master_thesis">github.com/emijlop/master_thesis</a></footer>
 
 <script>
 {
@@ -362,6 +507,7 @@ const method=[
 ["Coherence","Homogeneity, completeness","V-measure family (Rosenberg & Hirschberg, 2007)","Shuffled-label floor; template-ID comparison"],
 ["Category probe","Logistic regression on BBQ categories","Linear separability of labelled content","Template-grouped CV (Hewitt & Liang, 2019)"],
 ["Identity probes","One probe per dimension, trained on HESEIA","Community labels as reference frame","Control task, selectivity, transfer AUC, language centering"],
+["Inference","Template-level permutation tests, template bootstrap","Template is the unit of independent information","BH correction across categories and clusters"],
 ["Interpretation","Close reading of clusters","Validation of topic labels (Ying et al., 2022; Grimmer & Stewart, 2013)","Hand-coded sample per cluster (planned)"]];
 document.getElementById("methodrows").innerHTML=method.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Step","Choice","Why","Check"][i]}">${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
 
@@ -379,6 +525,16 @@ document.getElementById("cats").innerHTML=cats.map(([n,v,x])=>`<span>${esc(n)}</
 const topics=[[0,150,"teenagers, neighbors, windows, hanging"],[1,120,"demanding, preserve, forest, neighborhood"],[2,116,"card, pulled, snap, amex"],[3,112,"helpful, forgetting, mixing, raised"],[4,108,"comparing, graduated, failed, times"],[5,108,"contestants, contestant, worst, profession"]];
 document.getElementById("topics").innerHTML=topics.map(([t,n,k])=>`<tr><td data-l="Topic">${t}</td><td class="num" data-l="Items">${n}</td><td data-l="Keywords" style="color:var(--mute)">${esc(k)}</td></tr>`).join("");
 
+const runs=[
+["R1 default","01","LaBSE, min_cluster 10, seed 42, both views, B = 999","RQ1 main result and tests"],
+["R2 grid","01","min_cluster 5–40 × seeds 0–2 (inside R1)","Stability of R1"],
+["R3 mpnet","01","Robust encoder instead of LaBSE","Encoder sensitivity"],
+["R4 SOFA-like","01","UMAP 15 dims, min_cluster ≈ 1% of items","Comparability with SOFA"],
+["R5 probes","02","After HESEIA columns and label map are set","Probe quality, transfer, cluster drivers"],
+["R6 centered","02","Per-language mean-centering","Language confound in transfer"]];
+document.getElementById("runrows").innerHTML=runs.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Run","Notebook","Setting","Answers"][i]}">${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
+const fields=[["Hardware","platform, CPU count, RAM, GPU name and memory, Colab or local"],["Software","Python and versions of numpy, scikit-learn, torch, sentence-transformers, umap-learn, hdbscan, bertopic"],["Code","git commit of the repository"],["Configuration","encoder, seed, min_cluster, items per view, permutations"],["Timings","seconds per step: embedding, clustering, tests, sensitivity"],["Results","headline numbers: clusters, noise share, test statistics, p-values"]];
+document.getElementById("manifest").innerHTML=fields.map(([a,b])=>`<tr><td><b>${esc(a)}</b></td><td>${esc(b)}</td></tr>`).join("");
 const nbs=[
 ["00","Exploration","First BERTopic run with defaults on BBQ. Superseded; kept for the record.","00_exploration_bertopic_bbq.ipynb","Run, outputs saved"],
 ["01","RQ1 coherence","BBQ in masked and unmasked views, coherence metrics, intersectionality, sensitivity grid, category probe.","01_bbq_rq1_internal_coherence.ipynb","Tested on synthetic data; next: run on BBQ"],
