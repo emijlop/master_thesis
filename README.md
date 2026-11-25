@@ -1,5 +1,9 @@
 # Same Category, Different Territory
 
+[![Start here: thesis walkthrough](https://img.shields.io/badge/Start_here-Thesis_walkthrough-1a73e8?style=for-the-badge)](https://emijlop.github.io/master_thesis/presentation/Thesis_walkthrough.html)
+
+> **New here?** The [**thesis walkthrough**](https://emijlop.github.io/master_thesis/presentation/Thesis_walkthrough.html) gives the motivation, construct, methodology, data, pipeline, first results and open questions on one page. Its source is [`docs/presentation/Thesis_walkthrough.html`](docs/presentation/Thesis_walkthrough.html).
+
 **Institutional and Community Framings of Social Bias in LLM Benchmarks** (tentative title)
 
 Master thesis, Hertie School Data Science Lab, October 2026 – April 2027
