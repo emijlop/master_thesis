@@ -125,6 +125,52 @@ mjx-container[display="true"]{margin:0!important}
 .test dd{margin:0;font-size:15.5px}
 @media(max-width:600px){.test dl{grid-template-columns:minmax(0,1fr)}.test dt{padding-top:6px}}
 .pending{color:var(--mute);font-style:italic}
+.g{text-decoration:underline dotted;text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
+.g:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+th .g::after{content:" ?";color:var(--blue);font-weight:700}
+#pop{position:absolute;z-index:50;max-width:min(340px,calc(100vw - 24px));background:var(--bg);color:var(--ink);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--blue);padding:10px 12px;font:400 14px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;display:none}
+#pop b{display:block;font:400 14px Silkscreen,"Space Mono",monospace;margin-bottom:4px}
+#pop em{display:block;margin-top:6px;color:var(--mute);font-style:normal;font-size:13px}
+.unit{border:3px solid var(--ink);background:var(--soft);padding:14px 18px;margin:6px 0 18px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.unit i{font:400 24px Silkscreen,monospace;font-style:normal;background:var(--ink);color:var(--bg);width:42px;height:42px;display:grid;place-items:center}
+.unit b{font:400 18px Silkscreen,monospace;display:block;margin-bottom:4px}
+.unit p{margin:0;max-width:none}
+.prov{display:inline-block;font:700 12.5px "Space Mono",monospace;background:var(--blue);color:#fff;padding:2px 8px;white-space:nowrap;vertical-align:middle}
+.finding{margin-top:34px;padding-top:18px;border-top:2px solid var(--ink)}
+.finding h3{margin-top:0;font-size:22px}
+.tag2{font:400 13px "Space Mono",monospace;color:var(--mute);margin:-4px 0 10px}
+.db{display:grid;grid-template-columns:max-content minmax(0,1fr) 4.6em;gap:8px 14px;align-items:center;font-size:14.5px}
+.db .trk{position:relative;height:18px}
+.db .trk::before{content:"";position:absolute;left:0;right:0;top:8px;border-top:1px solid var(--rule)}
+.db .ln{position:absolute;top:7px;height:3px;background:var(--mute)}
+.db .dot{position:absolute;top:2px;width:14px;height:14px;margin-left:-7px}
+.db .dot.t{border:2px solid var(--ink);background:var(--bg)}
+.db .dot.i{background:var(--blue)}
+.db .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.db .ax{grid-column:2;display:flex;justify-content:space-between;font:400 12.5px "Space Mono",monospace;color:var(--mute)}
+.key{display:flex;flex-wrap:wrap;gap:6px 18px;font:400 13.5px "Space Mono",monospace;color:var(--mute);margin:10px 0 4px}
+.key i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px}
+.hb{display:grid;grid-template-columns:max-content minmax(0,1fr) 5.4em;gap:6px 12px;align-items:center;font-size:14.5px}
+.hb .bar{height:14px;background:var(--blue)}
+.hb .bar.k{background:var(--ink)}
+.hb .bar.m{background:color-mix(in srgb,var(--mute) 55%,var(--bg))}
+.hb .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hb .sub{grid-column:1/-1;font:700 13px "Space Mono",monospace;color:var(--mute);margin-top:8px}
+table.num td,table.num th{text-align:right;white-space:nowrap}
+table.num td:first-child,table.num th:first-child,table.num td:nth-child(2),table.num th:nth-child(2){text-align:left}
+table.num tr.null td{color:var(--mute)}
+table.num tr.sep td{border-top:2px solid var(--ink)}
+.cm{border-collapse:separate;border-spacing:2px;font:400 13px "Space Mono",monospace;width:auto}
+.cm th{font:700 12px "Space Mono",monospace;padding:4px;border:0;color:var(--mute);text-align:center}
+.cm th.r{text-align:right;padding-right:8px;white-space:nowrap}
+.cm td{width:52px;height:34px;padding:0;text-align:center;border:0;vertical-align:middle;font-variant-numeric:tabular-nums}
+.cm td.d{outline:2px solid var(--ink);outline-offset:-2px;font-weight:700}
+.stk{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 12px;align-items:center;font-size:14.5px}
+.stk .s{display:flex;height:26px}
+.stk .s span{display:flex;align-items:center;justify-content:center;color:#fff;font:700 12.5px "Space Mono",monospace;overflow:hidden;white-space:nowrap}
+.stk .s .o{color:var(--ink);background:color-mix(in srgb,var(--mute) 35%,var(--bg))}
+.fig.sm{height:270px}
+.fig text.lab{font:700 13px "Space Mono",monospace}
 .orange{--blue:light-dark(#f26b1d,#ff8f4d)}
 .orange h2{color:var(--blue)}
 .orange .kicker{color:var(--blue)}
@@ -171,7 +217,7 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
 </header>
 
 <nav class="toc" aria-label="Sections"><div class="wrap">
-  <a href="#motivation">Motivation</a><a href="#literature">Literature</a><a href="#construct">Construct</a><a href="#instrument">Instrument</a><a href="#theory">Theory</a><a href="#method">Method</a><a href="#math">How it works</a><a href="#tests">Tests</a><a href="#data">Data</a><a href="#pipeline">Pipeline</a><a href="#results">Results</a><a href="#notebooks">Notebooks</a><a href="#compute">Compute</a><a href="#all-questions">Questions</a>
+  <a href="#motivation">Motivation</a><a href="#literature">Literature</a><a href="#construct">Construct</a><a href="#instrument">Instrument</a><a href="#theory">Theory</a><a href="#method">Method</a><a href="#math">How it works</a><a href="#tests">Tests</a><a href="#data">Data</a><a href="#pipeline">Pipeline</a><a href="#results">Results</a><a href="#first-run">First run</a><a href="#notebooks">Notebooks</a><a href="#compute">Compute</a><a href="#all-questions">Questions</a>
 </div></nav>
 
 <main class="wrap">
@@ -263,10 +309,11 @@ footer{padding-block:28px;font-size:14px;color:var(--mute)}
 <section id="method">
   <div class="kicker">Methodology and justification</div>
   <h2>Each step has a precedent and a check</h2>
+  <div class="unit" id="unit"><i>1</i><div><b>Unit of analysis: the template</b><p>BBQ's 58,492 items are copies of a few hundred hand-written scenarios, with different names and group labels swapped in. Copies of one scenario are not independent evidence. This thesis therefore counts each scenario once: masked items are reduced to the distinct texts of each template, unmasked items are capped at six per template, and every test shuffles and resamples whole templates, never single items.</p></div></div>
   <p>The overall design follows computational grounded theory (Nelson, 2020): clusters detect patterns, close reading interprets them, and classifiers plus sensitivity checks confirm them.</p>
   <div class="scroll"><table class="stack"><thead><tr><th>Step</th><th>Choice</th><th>Justification</th><th>Check</th></tr></thead><tbody id="methodrows"></tbody></table></div>
   <div class="oq"><header><i>?</i>Open questions for NLP expertise</header><ul>
-    <li>LaBSE is trained for translation retrieval, not semantic similarity. Is it defensible as the main encoder, with multilingual mpnet as a check, or should it be the other way round?</li>
+    <li>LaBSE is trained for translation retrieval, not semantic similarity. <b>Partly answered:</b> in run R1, replacing it with multilingual mpnet changed the RQ1 metrics by at most 0.02. Should LaBSE stay the main encoder for RQ2 and RQ3, where English and Spanish are compared, or should newer multilingual models (e.g. multilingual-E5, BGE-M3) be tested too?</li>
     <li>Fine-tuning: is fine-tuned LaBSE (e.g. SetFit) worth running as a robustness comparison, given that clustering in a fine-tuned space would be circular?</li>
     <li>UMAP to 5 dimensions (mine) or 15 (SOFA), and min_cluster_size fixed at 10 or scaled to ~1% of the corpus?</li>
     <li>Are the probe thresholds sensible: AUC ≥ 0.75, selectivity ≥ 0.20, transfer AUC ≥ 0.70?</li>
@@ -327,7 +374,7 @@ gap = avg similarity within a category
 <section id="tests">
   <div class="kicker">Hypotheses and tests · draft</div>
   <h2>A first idea of how to test each sub-question</h2>
-  <p><span class="draft">Draft · not confirmed</span> These hypotheses and tests are a proposal to discuss, not a fixed design. One principle holds throughout: BBQ's items come from about 325 templates, so whole templates, not single items, are shuffled when building a "no effect" baseline.</p>
+  <p><span class="draft">Draft · not confirmed</span> These hypotheses and tests are a proposal to discuss, not a fixed design. One principle holds throughout: the template is the unit of analysis (<a href="#unit">see Methodology</a>), so whole templates, not single items, are shuffled when building a "no effect" baseline.</p>
 
   <div class="test"><header><b>RQ1</b><span>internal coherence · notebook 01, §5b</span></header><dl>
     <dt>H0 <span class="draft">draft</span></dt><dd>Clusters follow BBQ's templates, not its categories: knowing an item's category adds nothing once its template is known.</dd>
@@ -337,6 +384,7 @@ repeat 999 times:
     shuffle categories between whole templates
     null.append(agreement(clusters, shuffled))
 p = share of null ≥ observed</pre></dd>
+    <dt>Status</dt><dd>Quick run R1 done; the template-level test results (§5b) are still to be read.</dd>
   </dl></div>
 
   <div class="test"><header><b>RQ2</b><span>convergence · planned notebook 03</span></header><dl>
@@ -385,12 +433,135 @@ clusters with ≥ 90% HESEIA items → candidate "orphans"</pre></dd>
 </section>
 
 <section id="results">
-  <div class="kicker">First results · notebook 00</div>
+  <div class="kicker">Results · notebook 01, run R1</div>
+  <h2>BBQ's categories are held together by who is named, not by what is said</h2>
+  <p><span class="prov">Provisional</span> Quick run R1 on the DS Lab GPU (LaBSE, min_cluster 10, seed 42, 199 permutations). The template-level tests and a fix for masking in Race×SES are still pending, so every number here can still move.</p>
+  <div class="figs">
+    <div><b>0.80</b><span>AMI of clusters with templates (masked), vs. 0.33 with categories</span></div>
+    <div><b>0.24</b><span>completeness: each category is split across many clusters (masked)</span></div>
+    <div><b>0.85</b><span>macro-F1 on unseen scenarios with identity words; 0.42 without</span></div>
+    <div><b>84%</b><span>of Race×Gender items classified as race; 10% as gender</span></div>
+  </div>
+
+  <div class="finding" style="margin-top:8px;border-top:0;padding-top:0">
+    <h3>BBQ's weight follows copies, not stereotypes</h3>
+    <div class="tag2">Substantive validity · data, not yet clustering</div>
+    <div class="cols">
+      <div>
+        <div class="key"><span><i style="border:2px solid var(--ink)"></i>share of templates</span><span><i style="background:var(--blue)"></i>share of items</span><span>right: items per template</span></div>
+        <div class="db" id="framing"></div>
+      </div>
+      <div>
+        <p>The authors wrote 25 scenarios for most categories, 50 for gender identity and race/ethnicity (25 with labels, 25 with names). Each scenario was then copied by swapping in different people. Race×Gender holds <b>27% of all items from 12% of the templates</b>; the two intersectional categories together hold <b>46%</b> of BBQ. Sexual orientation has as many templates as Age or Religion but only <b>1.5% of the items</b>. Items per template range from 35 to 429, set by the length of name and label lists, not by the stereotypes.</p>
+        <p>The BBQ paper explains why: names are a common way race and gender are signalled, and intersectional templates need three kinds of comparison. It gives no reason for the range of copies per template and does not say whether scores weight items or templates. Any score averaged over items therefore leans on race-related intersectional content. This is why this thesis treats <a href="#unit">the template as the unit of analysis</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="finding">
+    <h3>Clusters follow scenarios, not categories</h3>
+    <div class="tag2">RQ1 · tap a heading or row label for an explanation</div>
+    <div class="scroll"><table class="num">
+      <thead><tr><th>View</th><th>Compared with</th><th><span class="g" tabindex="0" data-g="homogeneity">Homogeneity</span></th><th><span class="g" tabindex="0" data-g="completeness">Completeness</span></th><th><span class="g" tabindex="0" data-g="vmeasure">V-measure</span></th><th><span class="g" tabindex="0" data-g="ami">AMI</span></th></tr></thead>
+      <tbody>
+        <tr><td><b>Masked</b><br><span class="note">143 clusters, 8.7% noise</span></td><td><span class="g" tabindex="0" data-g="row-category">Category</span></td><td>0.810</td><td>0.244</td><td>0.375</td><td>0.332</td></tr>
+        <tr><td></td><td><span class="g" tabindex="0" data-g="row-template">Template</span></td><td>0.895</td><td>0.837</td><td>0.865</td><td><b>0.801</b></td></tr>
+        <tr class="null"><td></td><td><span class="g" tabindex="0" data-g="row-null">Chance (shuffled)</span></td><td>0.133</td><td>0.042</td><td>0.064</td><td>−0.001</td></tr>
+        <tr class="sep"><td><b>Unmasked</b><br><span class="note">103 clusters, 11.6% noise</span></td><td><span class="g" tabindex="0" data-g="row-category">Category</span></td><td>0.846</td><td>0.432</td><td>0.572</td><td>0.525</td></tr>
+        <tr><td></td><td><span class="g" tabindex="0" data-g="row-template">Template</span></td><td>0.801</td><td>1.000</td><td>0.889</td><td><b>0.753</b></td></tr>
+        <tr class="null"><td></td><td><span class="g" tabindex="0" data-g="row-null">Chance (shuffled)</span></td><td>0.145</td><td>0.075</td><td>0.099</td><td>0.000</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:14px">In both views, clusters agree far more with individual templates than with categories. Unmasked, every template ends up entirely inside one cluster (completeness 1.000). Category purity is high, but that follows automatically when clusters are scenarios. Categories hold together more when identity words are visible (AMI 0.53 vs. 0.33), the first sign that "who" matters more than "what". The chance row shuffles single items; the fairer test, which shuffles whole templates, is still pending.</p>
+  </div>
+
+  <div class="finding">
+    <h3>Every category splits into several groups of scenarios</h3>
+    <div class="tag2">RQ1 dispersion · unmasked</div>
+    <div class="cols">
+      <div>
+        <div class="key"><span><i style="background:var(--blue)"></i>clusters needed for 80% of the category, per template</span></div>
+        <div class="hb" id="disp"></div>
+      </div>
+      <div>
+        <div class="key"><span><i style="background:var(--ink)"></i>noise: items in no cluster</span></div>
+        <div class="hb" id="noise"></div>
+      </div>
+    </div>
+    <p style="margin-top:14px">No category has more than 23% of its items in one cluster. Relative to their number of templates, Religion and Gender identity are the most compact, and Nationality and Race/ethnicity the most scattered. Most categories need about 7–10 clusters for 80% of their items from 25 templates, so clusters do group a few related scenarios: sub-themes within a category. Age is an outlier: 44% of its items fit no cluster at all.</p>
+  </div>
+
+  <div class="finding">
+    <h3>The picture holds across settings and encoders</h3>
+    <div class="tag2">Robustness · masked</div>
+    <div class="cols">
+      <div>
+        <div class="key"><span><i style="background:var(--ink)"></i>homogeneity</span><span><i style="background:var(--blue)"></i>completeness</span><span><i style="background:repeating-linear-gradient(90deg,var(--blue) 0 5px,transparent 5px 8px)"></i>AMI</span></div>
+        <div class="fig sm" role="img" aria-label="Line chart: homogeneity falls from 0.90 to 0.49 as min_cluster rises from 5 to 40, while completeness stays between 0.26 and 0.22 and AMI between 0.34 and 0.29"><svg id="sens"></svg></div>
+        <p class="note">Mean of 3 seeds per setting. Clusters: 260 → 24; noise: 6% → 18%; seed agreement (ARI) 0.56 → 0.76.</p>
+      </div>
+      <div>
+        <p>Larger clusters do not gather categories: completeness stays flat while purity falls, so bigger clusters merge scenarios <em>across</em> categories. Replacing LaBSE with multilingual mpnet changes the metrics by at most 0.02.</p>
+        <div class="scroll"><table class="num"><thead><tr><th>min_cluster</th><th>Encoder</th><th>Clusters</th><th>Homog.</th><th>Compl.</th><th>AMI</th></tr></thead><tbody>
+          <tr><td>10</td><td>LaBSE</td><td>144</td><td>0.81</td><td>0.24</td><td>0.33</td></tr>
+          <tr><td>10</td><td>mpnet</td><td>149</td><td>0.81</td><td>0.25</td><td>0.34</td></tr>
+          <tr class="sep"><td>25</td><td>LaBSE</td><td>63</td><td>0.68</td><td>0.22</td><td>0.31</td></tr>
+          <tr><td>25</td><td>mpnet</td><td>49</td><td>0.65</td><td>0.24</td><td>0.33</td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="finding">
+    <h3>Identity words carry most of the category signal</h3>
+    <div class="tag2">RQ1 · linear probe on the nine single-axis categories, tested on unseen scenarios</div>
+    <div class="cols">
+      <div>
+        <div class="hb" id="f1"></div>
+        <p class="note" style="margin-top:8px">Grey: tested on copies of scenarios seen in training (memorizing). Blue: tested on unseen scenarios (honest). Chance is about 0.11.</p>
+      </div>
+      <div>
+        <p>On scenarios it never saw, a simple classifier recognises the category with macro-F1 0.85 when identity words are visible, but 0.42 when they are masked. The scenario content carries some category signal, clearly above chance, but most of it comes from who is named. The gap between seen and unseen scenarios (0.83 vs. 0.42 masked) shows how much a naive evaluation would overstate.</p>
+      </div>
+    </div>
+    <h3 style="margin-top:24px">Where categories blur together without identity words</h3>
+    <p class="note">Masked, unseen scenarios. Rows: true category; columns: predicted. The outlined diagonal is correct.</p>
+    <div class="scroll"><table class="cm" id="cm"></table></div>
+    <p style="margin-top:12px">Gender identity is the easiest to recognise from content alone (0.64), disability the hardest (0.13), and its scenarios are read as nationality or sexual orientation. Nationality is often read as race (0.24), and SES as gender identity (0.28). Sexual orientation is sometimes read as gender identity (0.13), rarely the reverse (0.02).</p>
+  </div>
+
+  <div class="finding">
+    <h3>Intersectional items read as race</h3>
+    <div class="tag2">Structural validity · classifier trained on single-axis categories only</div>
+    <div class="cols">
+      <div>
+        <div class="key"><span><i style="background:var(--blue)"></i>race / ethnicity</span><span><i style="background:var(--ink)"></i>the second axis (gender or SES)</span><span><i style="background:color-mix(in srgb,var(--mute) 35%,var(--bg))"></i>other</span></div>
+        <div class="stk" id="inter"></div>
+      </div>
+      <div>
+        <p>With names visible, 84% of Race×Gender items are classified as race and only 10% as gender; Race×SES items read as race (62%) more than as SES (31%). This supports an additive reading: BBQ's intersectional categories function mostly as race categories with a second attribute attached. A classifier must choose one label, so notebook 02's probes, which can register both axes at once, are the fairer test.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:34px">Run status</h3>
+  <div class="scroll"><table class="stack"><thead><tr><th>Run</th><th>Notebook</th><th>Setting</th><th>Answers</th><th>Status</th></tr></thead><tbody id="runrows"></tbody></table></div>
+
+  <div class="oq"><header><i>?</i>Open questions</header><ul>
+    <li>Masking fails for Race×SES: 2,405 of 4,025 masked texts (60%) come from that one category, because names or job descriptions stay in the text. Its masked results are excluded from interpretation until fixed. Is replacing every name and occupation term the right fix, or does that remove SES content itself?</li>
+    <li>The data has 343 template IDs, the BBQ paper reports 325 templates. The difference sits in the intersectional categories (42 and 26 instead of 25 each). How should a "template" be defined there?</li>
+    <li>Why does Age barely cluster (44% noise when unmasked)? Are its scenarios more varied, or do its many age descriptions ("grandfather", "22-year-old") break up the density?</li>
+    <li>Is dividing "clusters needed for 80%" by the number of templates a fair way to compare categories of different sizes?</li>
+  </ul></div>
+</section>
+
+<section id="first-run">
+  <div class="kicker">First exploration · notebook 00</div>
   <h2>The first run found BBQ's templates, not its categories</h2>
   <div class="figs">
     <div><b>14,187</b><span>unique disambiguated contexts</span></div>
     <div><b>449</b><span>topics at min_topic_size 10, incl. noise</span></div>
-    <div><b>≈325</b><span>hand-written templates in BBQ</span></div>
+    <div><b>325</b><span>templates according to the BBQ paper</span></div>
     <div><b>17×</b><span>Race×Gender vs. sexual orientation items</span></div>
   </div>
   <div class="cols">
@@ -404,15 +575,7 @@ clusters with ≥ 90% HESEIA items → candidate "orphans"</pre></dd>
       <div class="scroll"><table class="stack"><thead><tr><th>Topic</th><th>Items</th><th>Top keywords</th></tr></thead><tbody id="topics"></tbody></table></div>
     </div>
   </div>
-  <p style="margin-top:18px">With BERTopic's defaults (English all-MiniLM-L6-v2), 610 items (4.3%) were noise; raising min_topic_size to 25 gave 31 topics. The topic count sits near BBQ's template count, and keywords such as "card, pulled, snap, amex" describe one SES scenario about paying with a SNAP card. If clusters are templates, RQ1 looks perfectly coherent for a trivial reason. Notebook 01 therefore changes the encoder, the text unit and the template control, and scores clusters against template IDs to test this.</p>
-
-  <h3>Run plan before adding plots</h3>
-  <p>Plots of notebooks 01 and 02 will be added once these runs are done. Each run tags its files with <code>RUN</code> and writes a <code>run_*.json</code> manifest.</p>
-  <div class="scroll"><table class="stack"><thead><tr><th>Run</th><th>Notebook</th><th>Setting</th><th>Answers</th></tr></thead><tbody id="runrows"></tbody></table></div>
-  <div class="oq"><header><i>?</i>Open questions</header><ul>
-    <li>Is scoring clusters against template IDs enough, or should RQ1 also be run with one item per template?</li>
-    <li>Masking replaces the two target people with "Person A / B". Does that remove enough identity signal, or do occupations and names left in the text still give the category away?</li>
-  </ul></div>
+  <p style="margin-top:18px">With BERTopic's defaults (English all-MiniLM-L6-v2), keywords such as "card, pulled, snap, amex" described single scenarios. Notebook 01 changed the encoder, the text unit and the template control, and run R1 confirmed the suspicion with the improved pipeline (see Results).</p>
 </section>
 
 <section id="notebooks">
@@ -437,15 +600,17 @@ clusters with ≥ 90% HESEIA items → candidate "orphans"</pre></dd>
         <tr><td>Encoder</td><td>LaBSE, frozen, 768-d; mpnet as a check</td></tr>
         <tr><td>Seeds</td><td>42 for the main run; 0, 1, 2 in the sensitivity grid</td></tr>
         <tr><td>Embeddings</td><td>Cached as <code>.npy</code>; every later step reuses them</td></tr>
+        <tr><td>Environment</td><td>Python environment from <code>pyproject.toml</code> (<code>pip install -e ".[pipeline,dev]"</code>)</td></tr>
         <tr><td>Data</td><td>Not redistributed; sources and access dates in <code>data/README.md</code></td></tr>
         <tr><td>Tests</td><td>27 unit tests on synthetic data, no downloads</td></tr>
       </tbody></table>
       <h3>Hardware</h3>
-      <p class="pending">Filled in from the first run manifest.</p>
+      <p>Most runs use the GPU server of the Hertie School Data Science Lab, accessed through the university VPN. Some exploratory runs, including notebook 00, ran in Google Colab. Each run's manifest records which machine it used.</p>
+      <p class="pending">Run R1 ran on the DS Lab server; clustering both views took about one minute. The exact GPU model and runtimes are added from the run manifest.</p>
     </div>
   </div>
   <div class="oq"><header><i>?</i>Open questions</header><ul>
-    <li>Is Colab's GPU enough, or should the full grid run on a Hertie or lab machine? Embedding is the only heavy step; everything after reuses the cached vectors.</li>
+    <li>Should all runs that are compared with each other (e.g. R1 vs. R3) be repeated on the same machine, or is a fixed seed enough for comparability between Colab and the lab server?</li>
     <li>Should the cached embeddings be archived (e.g. Zenodo) so results can be reproduced without re-encoding?</li>
   </ul></div>
 </section>
@@ -458,7 +623,7 @@ clusters with ≥ 90% HESEIA items → candidate "orphans"</pre></dd>
 
 </main>
 
-<footer class="wrap">Figures in "First results" come from the outputs of notebook 00. Test code is in <code>src/benchbias/stats.py</code>; the formal version is in <code>docs/statistical_tests_full.md</code>. Template count as reported by Parrish et al. (2022). Repository: <a href="https://github.com/emijlop/master_thesis">github.com/emijlop/master_thesis</a></footer>
+<footer class="wrap">Results come from run R1 of notebook 01 (provisional) and from notebook 00. Test code is in <code>src/benchbias/stats.py</code>; the formal version is in <code>docs/statistical_tests_full.md</code>. Template count: 325 as reported by Parrish et al. (2022), 343 template IDs in the data. Repository: <a href="https://github.com/emijlop/master_thesis">github.com/emijlop/master_thesis</a></footer>
 
 <script>
 {
@@ -501,6 +666,7 @@ const drawTitle=()=>{
 const roT=new ResizeObserver(drawTitle); roT.observe(tsvg); roT.observe(lsvg); drawTitle();
 
 const method=[
+["Unit of analysis","The template, not the item","Copies of one scenario are not independent evidence","De-duplicate or cap per template; shuffle and resample whole templates"],
 ["Units","Ambiguous context + negative question; masked and unmasked views","Separates what is said from who is targeted","Mask coverage; cross-category duplicates"],
 ["Embedding","Frozen LaBSE","Cross-lingual space for EN and ES (Feng et al., 2022); no encoder dominates all tasks (Muennighoff et al., 2023)","Second encoder: multilingual mpnet"],
 ["Reduction + clustering","UMAP → HDBSCAN","Sequence used by SOFA (Marchiori Manerba et al., 2024); BERTopic (Grootendorst, 2022)","Grid over min_cluster_size × seeds; seed ARI"],
@@ -512,7 +678,7 @@ const method=[
 document.getElementById("methodrows").innerHTML=method.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Step","Choice","Why","Check"][i]}">${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
 
 const data=[
-["BBQ","Industry-adopted (Parrish et al., 2022)","English, U.S.","QA scenarios from ~325 templates","58,492 items","Institutional framing"],
+["BBQ","Industry-adopted (Parrish et al., 2022)","English, U.S.","QA scenarios from 325 templates (paper; 343 template IDs in the data)","58,492 items","Institutional framing"],
 ["HESEIA","Community-built (Ivetta et al., 2025)","Spanish, Argentina","Stereotype sentences, multi-label","46,499 sentences","Community framing; probe training"],
 ["WinoBias","Academic (Zhao et al., 2018)","English","Coreference, binary gender × 40 occupations","3,160 sentences","Academic framing"],
 ["EsBBQ","Academic adaptation (Ruiz-Fernández et al., 2025)","Spanish, Spain","QA, as BBQ","","Language control"],
@@ -526,20 +692,123 @@ const topics=[[0,150,"teenagers, neighbors, windows, hanging"],[1,120,"demanding
 document.getElementById("topics").innerHTML=topics.map(([t,n,k])=>`<tr><td data-l="Topic">${t}</td><td class="num" data-l="Items">${n}</td><td data-l="Keywords" style="color:var(--mute)">${esc(k)}</td></tr>`).join("");
 
 const runs=[
-["R1 default","01","LaBSE, min_cluster 10, seed 42, both views, B = 999","RQ1 main result and tests"],
-["R2 grid","01","min_cluster 5–40 × seeds 0–2 (inside R1)","Stability of R1"],
-["R3 mpnet","01","Robust encoder instead of LaBSE","Encoder sensitivity"],
-["R4 SOFA-like","01","UMAP 15 dims, min_cluster ≈ 1% of items","Comparability with SOFA"],
-["R5 probes","02","After HESEIA columns and label map are set","Probe quality, transfer, cluster drivers"],
-["R6 centered","02","Per-language mean-centering","Language confound in transfer"]];
-document.getElementById("runrows").innerHTML=runs.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Run","Notebook","Setting","Answers"][i]}">${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
+["R1 default","01","LaBSE, min_cluster 10, seed 42, both views","RQ1 main result and tests","Quick pass done (199 permutations); full run pending"],
+["R2 grid","01","min_cluster 5–40 × seeds 0–2 (inside R1)","Stability of R1","Done for the masked view"],
+["R3 mpnet","01","Robust encoder instead of LaBSE","Encoder sensitivity","Check done inside R1 (masked, 2 settings)"],
+["R4 SOFA-like","01","UMAP 15 dims, min_cluster ≈ 1% of items","Comparability with SOFA","Not yet"],
+["R5 probes","02","After HESEIA columns and label map are set","Probe quality, transfer, cluster drivers","Needs HESEIA"],
+["R6 centered","02","Per-language mean-centering","Language confound in transfer","Not yet"]];
+document.getElementById("runrows").innerHTML=runs.map(r=>`<tr>${r.map((c,i)=>`<td data-l="${["Run","Notebook","Setting","Answers","Status"][i]}">${i===0?`<b>${esc(c)}</b>`:esc(c)}</td>`).join("")}</tr>`).join("");
 const fields=[["Hardware","platform, CPU count, RAM, GPU name and memory, Colab or local"],["Software","Python and versions of numpy, scikit-learn, torch, sentence-transformers, umap-learn, hdbscan, bertopic"],["Code","git commit of the repository"],["Configuration","encoder, seed, min_cluster, items per view, permutations"],["Timings","seconds per step: embedding, clustering, tests, sensitivity"],["Results","headline numbers: clusters, noise share, test statistics, p-values"]];
 document.getElementById("manifest").innerHTML=fields.map(([a,b])=>`<tr><td><b>${esc(a)}</b></td><td>${esc(b)}</td></tr>`).join("");
 const nbs=[
 ["00","Exploration","First BERTopic run with defaults on BBQ. Superseded; kept for the record.","00_exploration_bertopic_bbq.ipynb","Run, outputs saved"],
-["01","RQ1 coherence","BBQ in masked and unmasked views, coherence metrics, intersectionality, sensitivity grid, category probe.","01_bbq_rq1_internal_coherence.ipynb","Tested on synthetic data; next: run on BBQ"],
+["01","RQ1 coherence","BBQ in masked and unmasked views, coherence metrics, intersectionality, sensitivity grid, category probe.","01_bbq_rq1_internal_coherence.ipynb","Quick run R1 on the DS Lab GPU; results provisional"],
 ["02","Identity probes","HESEIA-trained probes on frozen LaBSE, transfer to BBQ, cluster drivers, co-activation.","02_identity_probes.ipynb","Needs HESEIA columns and label map"]];
 document.getElementById("nbcards").innerHTML=nbs.map(([n,t,d,f,s])=>`<div class="nb"><b>${esc(n)} ${esc(t)}</b><p>${esc(d)}</p><span class="state">${esc(s)}</span><div class="btns"><a class="btn" href="${GH+f}">GitHub</a><a class="btn ghost" href="${CO+f}">Colab</a></div></div>`).join("");
+
+
+/* ---------- R1 charts ---------- */
+const fr=[["Race × Gender",15960,42,380.0,.273,.122],["Race × SES",11160,26,429.2,.191,.076],["Race / ethnicity",6880,50,137.6,.118,.146],["SES",6864,25,274.6,.117,.073],["Gender identity",5672,50,113.4,.097,.146],["Age",3680,25,147.2,.063,.073],["Nationality",3080,25,123.2,.053,.073],["Physical appearance",1576,25,63.0,.027,.073],["Disability",1556,25,62.2,.027,.073],["Religion",1200,25,48.0,.021,.073],["Sexual orientation",864,25,34.6,.015,.073]];
+const X=v=>(v/.30*100).toFixed(1);
+document.getElementById("framing").innerHTML=fr.map(([n,it,t,ipt,si,st])=>{const lo=Math.min(si,st),hi=Math.max(si,st);
+  return `<span>${esc(n)}</span><div class="trk" title="${esc(n)}: ${(si*100).toFixed(1)}% of items, ${(st*100).toFixed(1)}% of templates (${it.toLocaleString("en")} items, ${t} templates)"><div class="ln" style="left:${X(lo)}%;width:${(X(hi)-X(lo)).toFixed(1)}%"></div><div class="dot t" style="left:${X(st)}%"></div><div class="dot i" style="left:${X(si)}%"></div></div><span class="n">${ipt.toFixed(0)}</span>`}).join("")+`<div class="ax"><span>0%</span><span>10%</span><span>20%</span><span>30%</span></div>`;
+
+const dsp=[["Religion",6,25,.080],["Gender identity",12,50,.142],["Age",7,25,.440],["Sexual orientation",7,25,.280],["Disability",7,25,.108],["SES",8,25,.120],["Race × Gender",14,42,.024],["Physical appearance",9,25,.211],["Race / ethnicity",19,50,.003],["Race × SES",10,26,.000],["Nationality",10,25,.040]];
+document.getElementById("disp").innerHTML=dsp.map(([n,c,t])=>`<span>${esc(n)}</span><div class="bar" style="width:${(c/t/.5*100).toFixed(1)}%"></div><span class="n">${c} / ${t}</span>`).join("");
+document.getElementById("noise").innerHTML=dsp.map(([n,,,z])=>`<span>${esc(n)}</span><div class="bar k" style="width:${Math.max(z/.5*100,.6).toFixed(1)}%"></div><span class="n">${Math.round(z*100)}%</span>`).join("");
+
+const f1=[["Masked","seen scenarios",.828,1],["","unseen scenarios",.417,0],["Unmasked","seen scenarios",.984,1],["","unseen scenarios",.854,0]];
+document.getElementById("f1").innerHTML=f1.map(([v,l,x,seen])=>`${v?`<span class="sub">${v}</span>`:""}<span>${esc(l)}</span><div class="bar${seen?" m":""}" style="width:${(x*100).toFixed(1)}%"></div><span class="n">${x.toFixed(2)}</span>`).join("");
+
+const cl=["Age","Disability","Gender","Nationality","Appearance","Race","Religion","SES","Sex. orient."];
+const cmv=[[.45,.06,.05,.20,.08,.03,.06,.06,.00],[.00,.13,.11,.27,.14,.04,.00,.10,.21],[.04,.03,.64,.05,.04,.01,.00,.18,.02],[.12,.11,.03,.33,.05,.24,.00,.01,.12],[.04,.06,.00,.06,.44,.12,.10,.03,.15],[.03,.00,.04,.10,.13,.51,.06,.04,.08],[.17,.07,.02,.05,.06,.14,.45,.00,.05],[.01,.08,.28,.09,.07,.03,.00,.44,.00],[.03,.10,.13,.05,.02,.05,.10,.07,.45]];
+document.getElementById("cm").innerHTML=`<thead><tr><th></th>${cl.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>`+cmv.map((r,i)=>`<tr><th class="r">${esc(cl[i])}</th>${r.map((v,j)=>`<td class="${i===j?"d":""}" title="${esc(cl[i])} → ${esc(cl[j])}: ${v.toFixed(2)}" style="background:color-mix(in srgb,var(--blue) ${Math.round(v/.7*100)}%,var(--bg));color:${v>=.35?"#fff":"inherit"}">${v?v.toFixed(2).replace(/^0/,""):""}</td>`).join("")}</tr>`).join("")+"</tbody>";
+
+const inter=[["Race×Gender · unmasked",.837,.095,"gender"],["Race×SES · unmasked",.622,.308,"SES"],["Race×Gender · masked",.302,.036,"gender"],["Race×SES · masked",.214,.441,"SES"]];
+document.getElementById("inter").innerHTML=inter.map(([n,r,s2,lab])=>{const o=1-r-s2,p=v=>(v*100).toFixed(1);
+  return `<span>${esc(n)}</span><div class="s" title="${esc(n)}: race ${p(r)}%, ${lab} ${p(s2)}%, other ${p(o)}%"><span style="width:${p(r)}%;background:var(--blue)">${r>=.12?"race "+Math.round(r*100)+"%":""}</span><span style="width:${p(s2)}%;background:var(--ink);color:var(--bg)">${s2>=.12?lab+" "+Math.round(s2*100)+"%":""}</span><span class="o" style="width:${p(o)}%">${o>=.12?"other":""}</span></div>`}).join("");
+
+const ssvg=document.getElementById("sens");
+const sx=[5,10,15,25,40], ser=[["homogeneity",[.900,.812,.774,.677,.492],"var(--ink)",""],["completeness",[.259,.243,.235,.222,.217],"var(--blue)",""],["AMI",[.342,.331,.325,.307,.289],"var(--blue)","5 4"]];
+const drawSens=()=>{const W=ssvg.clientWidth,H=ssvg.clientHeight;if(!W||!H)return;
+  const m={l:46,r:16,t:12,b:40},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const x=i=>m.l+iw*i/(sx.length-1), y=v=>m.t+ih*(1-v);
+  const ink=getComputedStyle(document.body).color;
+  let g=[0,.25,.5,.75,1].map(v=>`<line x1="${m.l}" x2="${m.l+iw}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/><text x="${m.l-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`).join("");
+  g+=sx.map((v,i)=>`<text x="${x(i)}" y="${H-20}" text-anchor="middle">${v}</text>`).join("")+`<text x="${m.l+iw/2}" y="${H-3}" text-anchor="middle">min_cluster</text>`;
+  ser.forEach(([n,vs,c,d])=>{g+=`<polyline fill="none" stroke="${c}" stroke-width="2.5" stroke-dasharray="${d}" points="${vs.map((v,i)=>x(i)+","+y(v)).join(" ")}"/>`+vs.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${c}"/>`).join("");
+    if(false) g+=`<text class="lab" x="${x(4)+10}" y="${y(vs[4])+(n==="AMI"?-6:n==="completeness"?14:4)}" style="fill:${c==="var(--ink)"?ink:c}">${n}</text>`;});
+  ssvg.innerHTML=g;};
+const roS=new ResizeObserver(drawSens); roS.observe(ssvg); drawSens();
+
+
+/* ---------- glossary: hover or tap ---------- */
+const GL={
+embedding:["Embedding","A list of 768 numbers that represents a sentence's meaning. Sentences with similar meanings get similar lists, so their points lie close together."],
+labse:["LaBSE","The language model that turns each sentence into an embedding. It was trained on translations, so English and Spanish sentences with the same meaning land in the same place."],
+frozen:["Frozen","The model is used as it is, never retrained on these benchmarks. Whatever structure appears comes from the model, not from fitting it to the data."],
+umap:["UMAP","Squeezes the 768 numbers per sentence down to a few (5 here), keeping neighbours close. Needed because clustering works poorly in very many dimensions."],
+hdbscan:["HDBSCAN","Finds dense regions of points and calls each one a cluster. It decides the number of clusters itself and leaves isolated points out as noise."],
+noise:["Noise","Items that lie in no dense region, so HDBSCAN puts them in no cluster. A high noise share means a category's items are spread thinly."],
+cluster:["Cluster","A group of items that lie close together in the embedding space, found without looking at any labels."],
+template:["Template","One hand-written BBQ scenario, encoding one stereotype. BBQ makes many items from each template by swapping in different names and groups. This thesis counts each template once."],
+masked:["Masked / unmasked","Masked: the two people are replaced with 'Person A' and 'Person B', leaving only what is said. Unmasked: names and group words stay in, showing who is targeted."],
+intersectional:["Intersectional category","A category built from two identity axes at once, in BBQ Race×Gender and Race×SES."],
+homogeneity:["Homogeneity (purity)","Does each cluster contain only one category? 0 to 1; 1 means every cluster is pure.","High purity alone does not prove coherence: if clusters are single scenarios, they are pure automatically."],
+completeness:["Completeness (dispersion)","Does each category stay together in one cluster? 0 to 1; 1 means each category is one cluster.","Low means the category is split across many clusters."],
+vmeasure:["V-measure","The balance of homogeneity and completeness (their harmonic mean). High only if clusters are pure and categories stay together."],
+ami:["AMI","Adjusted mutual information: overall agreement between clusters and labels, corrected for chance. 0 = random, 1 = perfect.","The best single number for comparing rows."],
+"row-category":["Category row","Clusters compared with BBQ's 11 categories (age, gender identity, religion, …)."],
+"row-template":["Template row","Clusters compared with the individual hand-written scenarios.","If this row scores higher than 'category', clusters mostly follow scenarios."],
+"row-null":["Chance row","The same comparison after shuffling the category labels, i.e. what chance alone produces. Real results should be far above it.","This row shuffles single items; the stricter test shuffles whole templates."],
+nullh:["Null hypothesis","The 'nothing special is going on' assumption a test tries to reject, e.g. 'categories add nothing beyond templates'."],
+perm:["Permutation test","Shuffle the labels many times and recompute the result each time. If the real result beats almost all shuffled versions, it is unlikely to be chance."],
+boot:["Resampling (bootstrap)","Redraw the data many times to see how much a result would vary. Here whole templates are redrawn, with all their copies."],
+pval:["p-value","The share of shuffled results that are at least as extreme as the real one. Small (e.g. below 0.05) means the result is unlikely under chance."],
+probe:["Probe / classifier","A simple model that learns to predict a label (e.g. a category) from embeddings, then is tested on new items. Good performance shows the label is readable from the embedding."],
+f1:["Macro-F1","How often a classifier's guesses are right, averaged so every category counts equally. 0 to 1; about 0.11 is chance for nine categories."],
+cmx:["Confusion matrix","For each true category (row), the share of items predicted as each category (column). The diagonal is correct; off-diagonal cells show which categories are confused."],
+auc:["AUC","How well a probe ranks items that have a label above those that don't. 0.5 = chance, 1 = perfect."],
+selectivity:["Selectivity","A probe's AUC minus the AUC of the same probe trained on shuffled labels. Shows how much is real signal rather than the probe memorizing."],
+control:["Control task","The same probe trained on shuffled labels. It sets the bar a real probe has to clear."],
+transfer:["Transfer","Applying probes trained on HESEIA to BBQ items and checking whether they recognise BBQ's own labels."],
+coverage:["Coverage","The share of one benchmark's items that fall close to some item of another benchmark. Asymmetric coverage hints at content one benchmark leaves out."],
+orphan:["Orphan cluster","A cluster made almost entirely of one benchmark's items: candidate content the other benchmarks do not have."],
+seed:["Seed","A fixed starting number for random steps (like UMAP), so a run can be reproduced exactly."],
+ari:["ARI","Adjusted Rand index: how similar two clusterings are, corrected for chance. Used here to compare runs with different seeds; 1 = identical."]};
+const TERMS=[["embedding",/\bembeddings?\b/],["labse",/\bLaBSE\b/],["frozen",/\bfrozen\b/],["umap",/\bUMAP\b/],["hdbscan",/\bHDBSCAN\b/],["noise",/\bnoise\b/],["template",/\btemplates?\b/],["masked",/\bunmasked\b|\bmasked\b/],["intersectional",/\bintersectional\b/],["homogeneity",/\bhomogeneity\b/i],["completeness",/\bcompleteness\b/i],["vmeasure",/\bV-measure\b/],["ami",/\bAMI\b/],["nullh",/\bnull hypothes[ie]s\b/],["perm",/\bpermutations?\b|\bshuffl(?:e|es|ed|ing)\b/],["boot",/\bbootstrap\b|\bresampl(?:e|es|ed|ing)\b/],["pval",/\bp-values?\b/],["probe",/\bprobes?\b|\bclassifier\b/],["f1",/\bmacro-F1\b/],["auc",/\bAUC\b/],["selectivity",/\bselectivity\b/],["control",/\bcontrol (?:task|probe)\b/],["transfer",/\btransfer\b/],["coverage",/\bcoverage\b/],["orphan",/\borphans?\b|\borphan clusters?\b/],["seed",/\bseeds?\b/],["ari",/\bARI\b/],["cluster",/\bclusters?\b/]];
+const SKIP="code,pre,h1,h2,h3,svg,.g,.figs,nav,.kicker,.lit b,.test header,summary,a,.btn,.nb b,th,.key,.legend,.cm,.tag2,.prov,.draft,dt,.unit b,#pop,.db,.hb,.stk,.sub,.corner,.foot";
+for(const sec of document.querySelectorAll("main section")){
+  if(sec.id==="all-questions") continue;
+  const used=new Set();
+  for(const [k,re] of TERMS){
+    if(used.has(k)) continue;
+    const w=document.createTreeWalker(sec,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest(SKIP)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+    let n;
+    while((n=w.nextNode())){const m=n.data.match(re); if(!m) continue;
+      const r=n.splitText(m.index); r.splitText(m[0].length);
+      const sp=document.createElement("span"); sp.className="g"; sp.tabIndex=0; sp.dataset.g=k; sp.textContent=r.data; r.replaceWith(sp);
+      used.add(k); break;}
+  }
+}
+const pop=document.createElement("div"); pop.id="pop"; pop.setAttribute("role","tooltip"); document.body.appendChild(pop);
+let pinned=null;
+const show=el=>{const e=GL[el.dataset.g]; if(!e) return;
+  pop.innerHTML=`<b>${esc(e[0])}</b>${esc(e[1])}${e[2]?`<em>${esc(e[2])}</em>`:""}`; pop.style.display="block";
+  const r=el.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight;
+  let left=r.left+window.scrollX, top=r.bottom+window.scrollY+8;
+  left=Math.max(12,Math.min(left,window.scrollX+document.documentElement.clientWidth-pw-12));
+  if(r.bottom+ph+16>window.innerHeight && r.top>ph+16) top=r.top+window.scrollY-ph-8;
+  pop.style.left=left+"px"; pop.style.top=top+"px"; el.setAttribute("aria-describedby","pop");};
+const hide=()=>{pop.style.display="none"; pinned=null;};
+document.addEventListener("mouseover",e=>{const g=e.target.closest(".g"); if(g&&!pinned&&matchMedia("(hover:hover)").matches) show(g);});
+document.addEventListener("mouseout",e=>{const g=e.target.closest(".g"); if(g&&!pinned) pop.style.display="none";});
+document.addEventListener("click",e=>{const g=e.target.closest(".g"); if(g){ if(pinned===g){hide();return;} pinned=g; show(g); e.stopPropagation(); return;} if(!e.target.closest("#pop")) hide();});
+document.addEventListener("focusin",e=>{const g=e.target.closest(".g"); if(g) show(g);});
+document.addEventListener("focusout",e=>{if(e.target.closest(".g")&&!pinned) pop.style.display="none";});
+document.addEventListener("keydown",e=>{if(e.key==="Escape") hide(); const g=e.target.closest&&e.target.closest(".g"); if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault(); pinned=g; show(g);}});
+window.addEventListener("resize",()=>{ if(pop.style.display==="block") hide(); });
 
 const qs=[...document.querySelectorAll("section[id]")].flatMap(s=>{const area=s.querySelector(".kicker")?.textContent||"";return [...s.querySelectorAll(".oq li")].map(li=>[area,li.textContent]);});
 document.getElementById("qlist").innerHTML=qs.map(([a,q])=>`<li><span>${esc(a)}:</span> ${esc(q)}</li>`).join("");
